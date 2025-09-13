@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: draw2draw-backend
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/draw2draw
+    username: root
+    password: 123456
+
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+
+mybatis-plus:
+  global-config:
+    db-config:
+      # 逻辑删除
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    # 开启下划线转驼峰命名
+    map-underscore-to-camel-case: false
+    # 开启打印 SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+knife4j:
+  enable: true
+  openapi:
+    title: Draw2Draw接口文档
+    version: v1.0
+    group:
+      default:
+        group-name: 默认分组
+        api-rule: package
+        api-rule-resources:
+          - com.xm.draw2drawbackend.controller
