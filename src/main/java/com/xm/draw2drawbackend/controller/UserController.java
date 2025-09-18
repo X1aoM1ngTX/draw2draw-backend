@@ -1,0 +1,177 @@
+package com.xm.draw2drawbackend.controller;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xm.draw2drawbackend.annotation.AuthCheck;
+import com.xm.draw2drawbackend.common.BaseResponse;
+import com.xm.draw2drawbackend.common.DeleteRequest;
+import com.xm.draw2drawbackend.common.ResultUtils;
+import com.xm.draw2drawbackend.constant.UserConstant;
+import com.xm.draw2drawbackend.exception.ErrorCode;
+import com.xm.draw2drawbackend.exception.ThrowUtils;
+import com.xm.draw2drawbackend.model.dto.user.UserAddRequest;
+import com.xm.draw2drawbackend.model.dto.user.UserDeleteRequest;
+import com.xm.draw2drawbackend.model.dto.user.UserLoginRequest;
+import com.xm.draw2drawbackend.model.dto.user.UserQueryRequest;
+import com.xm.draw2drawbackend.model.dto.user.UserRegisterRequest;
+import com.xm.draw2drawbackend.model.dto.user.UserUpdateRequest;
+import com.xm.draw2drawbackend.model.entity.User;
+import com.xm.draw2drawbackend.model.vo.LoginUserVO;
+import com.xm.draw2drawbackend.model.vo.UserVO;
+import com.xm.draw2drawbackend.service.UserService;
+import com.xm.draw2drawbackend.utils.EncryptUtils;
+
+import cn.hutool.core.bean.BeanUtil;
+
+/**
+ * 主控制器
+ * 
+ * @author X1aoM1ngTX
+ */
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Resource
+    private UserService userService;
+
+    /**
+     * 用户注册
+     */
+    @PostMapping("/register")
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
+        long result = userService.userRegister(userAccount, userPassword, checkPassword);
+
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 用户登录
+     */
+    @PostMapping("/login")
+    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(userLoginRequest == null, ErrorCode.PARAMS_ERROR);
+        String userAccount = userLoginRequest.getUserAccount();
+        String userPassword = userLoginRequest.getUserPassword();
+        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
+
+        return ResultUtils.success(loginUserVO);
+    }
+
+    /**
+     * 用户登出
+     */
+    @PostMapping("/logout")
+    public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
+        ThrowUtils.throwIf(request == null, ErrorCode.OPERATION_ERROR);
+        Boolean result = userService.userLogout(request);
+        return ResultUtils.success(result);
+    }
+
+    /**
+     * 获取当前登录用户
+     */
+    @GetMapping("/get/login")
+    public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        return ResultUtils.success(userService.getLoginUserVO(loginUser));
+    }
+
+    /**
+     * 用户添加（管理员）
+     */
+    @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAdddRequest) {
+        ThrowUtils.throwIf(userAdddRequest == null, ErrorCode.PARAMS_ERROR);
+        User user = new User();
+        BeanUtil.copyProperties(userAdddRequest, user);
+        // 默认密码 12345678
+        final String DEAFULT_USER_PASSWORD = "12345678";
+        String encryptPassword = EncryptUtils.encryptPassword(DEAFULT_USER_PASSWORD);
+        user.setUserPassword(encryptPassword);
+
+        boolean result = userService.save(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "操作注册失败");
+        return ResultUtils.success(user.getId());
+    }
+
+    /**
+     * 获取用户（管理员）
+     */
+    @PostMapping("/get")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<User> getUserById(Long userId) {
+        ThrowUtils.throwIf(userId <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
+        User user = userService.getById(userId);
+        ThrowUtils.throwIf(user == null, ErrorCode.NOT_FOUND_ERROR, "用户不存在");
+        return ResultUtils.success(user);
+    }
+
+    /**
+     * 根据 id 获取包装类
+     */
+    @GetMapping("/get/vo")
+    public BaseResponse<UserVO> getUserVoById(long userId) {
+        BaseResponse<User> response = getUserById(userId);
+        User user = response.getData();
+        return ResultUtils.success(userService.getUserVO(user));
+    }
+
+    /**
+     * 删除用户（管理员）
+     */
+    @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest) {
+        ThrowUtils.throwIf(userDeleteRequest == null || userDeleteRequest.getUserId() == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        boolean result = userService.removeById(userDeleteRequest.getUserId());
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "删除失败");
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 更新用户（管理员）
+     */
+    @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) { 
+        ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User user = new User();
+        BeanUtil.copyProperties(userUpdateRequest, user);
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "更新失败");
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 分页获取用户封装列表（除管理员）
+     */
+    @PostMapping("/list/page/vo")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) { 
+        ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
+        long current = userQueryRequest.getCurrent();
+        long pageSize = userQueryRequest.getPageSize();
+        Page<User> userPage = userService.page(new Page<>(current, pageSize), userService.getQueryWrapper(userQueryRequest));
+        Page<UserVO> userVOPage = new Page<>(current, pageSize, userPage.getTotal());
+        List<UserVO> userVOList = userService.getUserVOList(userPage.getRecords());
+        userVOPage.setRecords(userVOList);
+        return ResultUtils.success(userVOPage);
+    }
+}
