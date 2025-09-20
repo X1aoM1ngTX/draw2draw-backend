@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
-* @author XMTX8yyds
+* @author X1aoM1ngTX
 * @description 针对表【user(用户)】的数据库操作Service
 * @createDate 2025-09-18 14:44:18
 */
@@ -35,20 +35,22 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取当前登录用户
+     * @param request HTTP请求对象
+     * @return 当前登录用户
      */
     User getLoginUser(HttpServletRequest request);
 
     /**
      * 用户登出
-     * @param request
-     * @return
+     * @param request HTTP请求对象
+     * @return 登出成功
      */
     boolean userLogout(HttpServletRequest request);
 
     /**
      * 获取脱敏的登录用户信息     
      * @param user 用户
-     * @return
+     * @return 脱敏的登录用户信息
      */
     LoginUserVO getLoginUserVO(User user);
 
@@ -72,4 +74,12 @@ public interface UserService extends IService<User> {
      * @return QueryWrapper<User> 查询包装器
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+
+    /**
+     * 是否为管理员
+     * @param request HTTP请求对象
+     * @return 是否为管理员
+     */    
+    boolean isAdmin(User user);
 }

@@ -7,6 +7,10 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * MyBatis-Plus配置类
+ * @author X1aoM1ngTX
+ */
 @Configuration
 @MapperScan("com.xm.draw2drawbackend.mapper")
 public class MyBatisPlusConfig {

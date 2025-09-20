@@ -21,8 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 主控制器
- * 
+ * 用户控制器
  * @author X1aoM1ngTX
  */
 @RestController

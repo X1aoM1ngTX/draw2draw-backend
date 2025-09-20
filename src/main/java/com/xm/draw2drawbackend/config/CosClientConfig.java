@@ -10,6 +10,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * COS对象存储客户端配置
+ * @author X1aoM1ngTX
+ */
 @Configuration  
 @ConfigurationProperties(prefix = "cos.client")  
 @Data  

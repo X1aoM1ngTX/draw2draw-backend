@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
-* @author XMTX8yyds
+* @author X1aoM1ngTX
 * @description 针对表【user(用户)】的数据库操作Service实现
 * @createDate 2025-09-18 14:44:18
 */
@@ -198,5 +198,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
         queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("ascend"), sortField);
         return queryWrapper;
+    }
+
+    /**
+     * 判断当前用户是否为管理员
+     * @param user 用户
+     * @return true: 管理员，false: 不是管理员
+     */
+    @Override
+    public boolean isAdmin(User user) {
+        // 返回是否为管理员
+        return user != null && UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 }

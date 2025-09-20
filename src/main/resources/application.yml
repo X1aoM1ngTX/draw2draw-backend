@@ -12,6 +12,10 @@ spring:
     url: jdbc:mysql://localhost:3306/d2d
     username: root
     password: 123456
+  # 配置文件上传大小限制
+  servlet:
+    multipart:
+      max-file-size: 10MB
 
 server:
   port: 8090

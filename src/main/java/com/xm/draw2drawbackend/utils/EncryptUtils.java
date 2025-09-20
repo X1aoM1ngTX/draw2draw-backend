@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  * 加密工具类
  * 基于 Hutool 提供多种加密算法支持
  * 
- * @author xm
+ * @author X1aoM1ngTX
  */
 @Slf4j
 public class EncryptUtils {

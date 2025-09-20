@@ -17,9 +17,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 权限拦截器
+ * @author X1aoM1ngTX
+ */
 // 标记此类为切面类，用于实现AOP功能
 @Aspect
-// 将此类注册为Spring组件，使其被Spring管理
 @Component
 public class AuthInterceptor {
 
