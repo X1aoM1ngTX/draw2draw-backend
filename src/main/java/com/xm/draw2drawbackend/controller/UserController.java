@@ -1,38 +1,24 @@
 package com.xm.draw2drawbackend.controller;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xm.draw2drawbackend.annotation.AuthCheck;
 import com.xm.draw2drawbackend.common.BaseResponse;
-import com.xm.draw2drawbackend.common.DeleteRequest;
 import com.xm.draw2drawbackend.common.ResultUtils;
 import com.xm.draw2drawbackend.constant.UserConstant;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.model.dto.user.UserAddRequest;
-import com.xm.draw2drawbackend.model.dto.user.UserDeleteRequest;
-import com.xm.draw2drawbackend.model.dto.user.UserLoginRequest;
-import com.xm.draw2drawbackend.model.dto.user.UserQueryRequest;
-import com.xm.draw2drawbackend.model.dto.user.UserRegisterRequest;
-import com.xm.draw2drawbackend.model.dto.user.UserUpdateRequest;
+import com.xm.draw2drawbackend.model.dto.user.*;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.LoginUserVO;
 import com.xm.draw2drawbackend.model.vo.UserVO;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.EncryptUtils;
+import org.springframework.web.bind.annotation.*;
 
-import cn.hutool.core.bean.BeanUtil;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 主控制器
@@ -139,10 +125,11 @@ public class UserController {
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest) {
-        ThrowUtils.throwIf(userDeleteRequest == null || userDeleteRequest.getUserId() == null, ErrorCode.PARAMS_ERROR, "参数错误");
-        boolean result = userService.removeById(userDeleteRequest.getUserId());
+        ThrowUtils.throwIf(userDeleteRequest == null || userDeleteRequest.getUserId() == null || userDeleteRequest.getUserId().isEmpty(), ErrorCode.PARAMS_ERROR, "参数错误");
+        long userId = Long.parseLong(userDeleteRequest.getUserId());
+        boolean result = userService.removeById(userId);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "删除失败");
-        return ResultUtils.success(true);
+        return ResultUtils.success(result);
     }
 
     /**

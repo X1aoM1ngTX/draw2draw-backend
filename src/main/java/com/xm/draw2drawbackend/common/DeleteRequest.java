@@ -1,8 +1,8 @@
 package com.xm.draw2drawbackend.common;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 通用删除请求

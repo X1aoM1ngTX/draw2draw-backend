@@ -31,4 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 自定义 ###
+application-dev.yml
+application-prod.yml
 *.txt

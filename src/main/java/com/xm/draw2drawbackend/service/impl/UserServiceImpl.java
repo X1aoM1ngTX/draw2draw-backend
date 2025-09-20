@@ -1,7 +1,15 @@
 package com.xm.draw2drawbackend.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xm.draw2drawbackend.constant.UserConstant;
+import com.xm.draw2drawbackend.exception.ErrorCode;
+import com.xm.draw2drawbackend.exception.ThrowUtils;
+import com.xm.draw2drawbackend.mapper.UserMapper;
 import com.xm.draw2drawbackend.model.dto.user.UserQueryRequest;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.enums.UserRoleEnum;
@@ -9,25 +17,13 @@ import com.xm.draw2drawbackend.model.vo.LoginUserVO;
 import com.xm.draw2drawbackend.model.vo.UserVO;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.EncryptUtils;
-
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-import com.xm.draw2drawbackend.constant.UserConstant;
-import com.xm.draw2drawbackend.exception.ErrorCode;
-import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.mapper.UserMapper;
-
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.stereotype.Service;
 
 /**
 * @author XMTX8yyds

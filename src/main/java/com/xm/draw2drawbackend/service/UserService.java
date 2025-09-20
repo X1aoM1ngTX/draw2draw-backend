@@ -1,16 +1,14 @@
 package com.xm.draw2drawbackend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.xm.draw2drawbackend.model.dto.user.UserQueryRequest;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.LoginUserVO;
 import com.xm.draw2drawbackend.model.vo.UserVO;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.IService;
+import java.util.List;
 
 /**
 * @author XMTX8yyds

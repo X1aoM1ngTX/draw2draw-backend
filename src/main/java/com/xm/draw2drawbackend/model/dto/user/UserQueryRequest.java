@@ -1,11 +1,10 @@
 package com.xm.draw2drawbackend.model.dto.user;
 
-import java.io.Serializable;
-
 import com.xm.draw2drawbackend.common.PageRequest;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

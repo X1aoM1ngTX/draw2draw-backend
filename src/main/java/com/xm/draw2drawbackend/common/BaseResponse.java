@@ -1,10 +1,9 @@
 package com.xm.draw2drawbackend.common;
 
+import com.xm.draw2drawbackend.exception.ErrorCode;
 import lombok.Data;
 
 import java.io.Serializable;
-
-import com.xm.draw2drawbackend.exception.ErrorCode;
 
 /**
  * 通用返回类

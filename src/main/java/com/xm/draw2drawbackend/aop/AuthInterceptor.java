@@ -1,8 +1,11 @@
 package com.xm.draw2drawbackend.aop;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
+import com.xm.draw2drawbackend.annotation.AuthCheck;
+import com.xm.draw2drawbackend.exception.ErrorCode;
+import com.xm.draw2drawbackend.exception.ThrowUtils;
+import com.xm.draw2drawbackend.model.entity.User;
+import com.xm.draw2drawbackend.model.enums.UserRoleEnum;
+import com.xm.draw2drawbackend.service.UserService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,12 +14,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.xm.draw2drawbackend.annotation.AuthCheck;
-import com.xm.draw2drawbackend.exception.ErrorCode;
-import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.model.entity.User;
-import com.xm.draw2drawbackend.model.enums.UserRoleEnum;
-import com.xm.draw2drawbackend.service.UserService;
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 // 标记此类为切面类，用于实现AOP功能
 @Aspect

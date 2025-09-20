@@ -1,6 +1,12 @@
+
+# 主配置文件
 spring:
   application:
     name: draw2draw-backend
+  profiles:
+    # 默认激活开发环境配置
+    active: dev
+  # 通用配置，所有环境共享
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/d2d

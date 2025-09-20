@@ -1,7 +1,7 @@
 package com.xm.draw2drawbackend.mapper;
 
-import com.xm.draw2drawbackend.model.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xm.draw2drawbackend.model.entity.User;
 
 /**
 * @author XMTX8yyds

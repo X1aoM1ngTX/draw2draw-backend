@@ -1,8 +1,8 @@
 package com.xm.draw2drawbackend.model.dto.user;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 @Data
 public class UserDeleteRequest implements Serializable {
