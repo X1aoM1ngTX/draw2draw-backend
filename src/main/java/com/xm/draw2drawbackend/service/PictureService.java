@@ -10,7 +10,6 @@ import com.xm.draw2drawbackend.model.dto.picture.PictureUploadRequest;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.PictureVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,20 +30,20 @@ public interface PictureService extends IService<Picture> {
     /**
      * 上传图片
      *
-     * @param multipartFile        图片文件
+     * @param inputSource          输入源
      * @param pictureUploadRequest 上传图片参数
      * @param loginUser            登录用户
      * @return
      */
     PictureVO uploadPicture(Object inputSource,
-            PictureUploadRequest pictureUploadRequest,
-            User loginUser);
+                            PictureUploadRequest pictureUploadRequest,
+                            User loginUser);
 
     /**
      * 批量抓取和创建图片
-     * 
-     * @param pictureUploadByBatchRequest
-     * @param loginUser
+     *
+     * @param pictureUploadByBatchRequest 批量上传图片请求
+     * @param loginUser                   登录用户
      * @return 成功创建的图片数
      */
     Integer uploadPictureByBatch(

@@ -1,7 +1,10 @@
 package com.xm.draw2drawbackend.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xm.draw2drawbackend.annotation.AuthCheck;
 import com.xm.draw2drawbackend.common.BaseResponse;
 import com.xm.draw2drawbackend.common.DeleteRequest;
@@ -19,6 +22,9 @@ import com.xm.draw2drawbackend.service.PictureService;
 import com.xm.draw2drawbackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 图片控制器
@@ -43,6 +50,20 @@ public class PictureController {
 
     @Resource
     private PictureService pictureService;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    /**
+     * 本地缓存
+     */
+    private final Cache<String, String> LOCAL_CACHE =
+            Caffeine.newBuilder()
+                    .initialCapacity(1024) // 初始化缓存数量
+                    .maximumSize(10000L) // 最大缓存数量
+                    .expireAfterWrite(5L, TimeUnit.MINUTES) // 缓存5分钟移除
+                    .build();
+
 
     /**
      * 上传图片（可重新上传）
@@ -78,7 +99,7 @@ public class PictureController {
     public BaseResponse<Integer> uploadPictureByBatch(
             @RequestBody PictureUploadByBatchRequest pictureUploadByBatchRequest,
             HttpServletRequest request) {
-                ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
         User loginUser = userService.getLoginUser(request);
         Integer uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
         return ResultUtils.success(uploadCount);
@@ -113,7 +134,7 @@ public class PictureController {
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest,
-            HttpServletRequest request) {
+                                               HttpServletRequest request) {
         ThrowUtils.throwIf(pictureUpdateRequest == null || pictureUpdateRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
         // 将实体类和 DTO 进行转换
         Picture picture = new Picture();
@@ -181,7 +202,7 @@ public class PictureController {
      */
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<PictureVO>> listPictureVOByPage(@RequestBody PictureQueryRequest pictureQueryRequest,
-            HttpServletRequest request) {
+                                                             HttpServletRequest request) {
         long current = pictureQueryRequest.getCurrent();
         long size = pictureQueryRequest.getPageSize();
         // 限制爬虫
@@ -196,11 +217,60 @@ public class PictureController {
     }
 
     /**
+     * 分页获取图片列表（封装类，有缓存）
+     */
+    @PostMapping("/list/page/vo/cache")
+    public BaseResponse<Page<PictureVO>> listPictureVOByPageWithCache(@RequestBody PictureQueryRequest pictureQueryRequest,
+                                                                      HttpServletRequest request) {
+        long current = pictureQueryRequest.getCurrent();
+        long size = pictureQueryRequest.getPageSize();
+        // 限制爬虫
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR, "一次最多获取20条数据");
+        // 普通用户默认只能看到审核通过的数据
+        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
+        // 缓存
+        String queryCondition = JSONUtil.toJsonStr(pictureQueryRequest);
+        String hashKey = DigestUtils.md5DigestAsHex(queryCondition.getBytes());
+        String cacheKey = String.format("listPictureVOByPage:%s", hashKey);
+
+        // 1. 先查询本地缓存
+        String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);
+        if (cachedValue != null) {
+            // 如果命中缓存,就返回结果
+            Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
+            return ResultUtils.success(cachePage);
+        }
+        // 2. 本地缓存未命中，查询 Redis 缓存
+        ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
+        cachedValue = opsForValue.get(cacheKey);
+        if (cachedValue != null) {
+            // 如果命中 Redis 缓存,就返回结果并写入本地缓存
+            LOCAL_CACHE.put(cacheKey, cachedValue);
+            Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
+            return ResultUtils.success(cachePage);
+        }
+        // 3. 缓存都未命中，则查询数据库，并更新本地和 Redis 缓存
+        Page<Picture> picturePage = pictureService.page(new Page<>(current, size),
+                pictureService.getQueryWrapper(pictureQueryRequest));
+        Page<PictureVO> pictureVOPage = pictureService.getPictureVOPage(picturePage, request);
+        // 4. 更新缓存
+        String cacheValue = JSONUtil.toJsonStr(pictureVOPage);
+        // 更新缓存
+        LOCAL_CACHE.put(cacheKey, cacheValue);
+        // 设置 Redis 缓存过期时间：5-10 分钟，避免缓存雪崩
+        int expireTime = RandomUtil.randomInt(5, 10);
+        // 更新 Redis 缓存
+        opsForValue.set(cacheKey, cacheValue, expireTime, TimeUnit.MINUTES);
+        // 获取封装类
+        return ResultUtils.success(pictureVOPage);
+    }
+
+    /**
      * 编辑图片（给用户使用）
      */
     @PostMapping("/edit")
     public BaseResponse<Boolean> editPicture(@RequestBody PictureEditRequest pictureEditRequest,
-            HttpServletRequest request) {
+                                             HttpServletRequest request) {
         ThrowUtils.throwIf(pictureEditRequest == null || pictureEditRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
         // 在此处将实体类和 DTO 进行转换
         Picture picture = new Picture();
@@ -220,7 +290,7 @@ public class PictureController {
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
         ThrowUtils.throwIf(!oldPicture.getUserId().equals(loginUser.getId())
-                && !userService.isAdmin(loginUser),
+                        && !userService.isAdmin(loginUser),
                 ErrorCode.OPERATION_ERROR,
                 "已存在相同名称的图片");
         boolean result = pictureService.updateById(picture);
@@ -247,7 +317,7 @@ public class PictureController {
     @PostMapping("/review")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest,
-            HttpServletRequest request) {
+                                                 HttpServletRequest request) {
         ThrowUtils.throwIf(pictureReviewRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
         User loginUser = userService.getLoginUser(request);
         pictureService.doPictureReview(pictureReviewRequest, loginUser);

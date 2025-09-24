@@ -11,6 +11,12 @@ spring:
     url: jdbc:mysql://localhost:3306/d2d
     username: root
     password: 123456
+  # Redis 配置
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    timeout: 5000
   # 配置文件上传大小限制
   servlet:
     multipart:
