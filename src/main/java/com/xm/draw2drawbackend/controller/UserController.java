@@ -8,6 +8,8 @@ import com.xm.draw2drawbackend.common.ResultUtils;
 import com.xm.draw2drawbackend.constant.UserConstant;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
+import com.xm.draw2drawbackend.manager.FileManager;
+import com.xm.draw2drawbackend.model.dto.file.UploadPictureResult;
 import com.xm.draw2drawbackend.model.dto.user.*;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.LoginUserVO;
@@ -15,6 +17,7 @@ import com.xm.draw2drawbackend.model.vo.UserVO;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.EncryptUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +25,7 @@ import java.util.List;
 
 /**
  * 用户控制器
+ *
  * @author X1aoM1ngTX
  */
 @RestController
@@ -30,6 +34,9 @@ public class UserController {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private FileManager fileManager;
 
     /**
      * 用户注册
@@ -136,7 +143,7 @@ public class UserController {
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) { 
+    public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ErrorCode.PARAMS_ERROR, "参数错误");
         User user = new User();
         BeanUtil.copyProperties(userUpdateRequest, user);
@@ -150,7 +157,7 @@ public class UserController {
      */
     @PostMapping("/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) { 
+    public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = userQueryRequest.getCurrent();
         long pageSize = userQueryRequest.getPageSize();
@@ -160,4 +167,31 @@ public class UserController {
         userVOPage.setRecords(userVOList);
         return ResultUtils.success(userVOPage);
     }
+
+    /**
+     * 上传用户头像
+     */
+    @PostMapping("/upload/avatar")
+    public BaseResponse<String> uploadUserAvatar(
+            @RequestPart("file") MultipartFile multipartFile,
+            HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH, "用户未登录");
+        
+        // 上传头像，按照用户 id 划分目录
+        String uploadPathPrefix = String.format("public/avatar/%s", loginUser.getId());
+        UploadPictureResult uploadPictureResult = fileManager.uploadPicture(multipartFile, uploadPathPrefix);
+        String avatarUrl = uploadPictureResult.getUrl();
+        
+        // 更新用户头像
+        User updateUser = new User();
+        updateUser.setId(loginUser.getId());
+        updateUser.setUserAvatar(avatarUrl);
+        boolean result = userService.updateById(updateUser);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "头像更新失败");
+        
+        return ResultUtils.success(avatarUrl);
+    }
+
+    
 }

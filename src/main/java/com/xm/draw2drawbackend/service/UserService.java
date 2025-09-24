@@ -11,22 +11,22 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
-* @author X1aoM1ngTX
-* @description 针对表【user(用户)】的数据库操作Service
-* @createDate 2025-09-18 14:44:18
-*/
+ * @author X1aoM1ngTX
+ * @description 针对表【user(用户)】的数据库操作Service
+ * @createDate 2025-09-18 14:44:18
+ */
 public interface UserService extends IService<User> {
 
     /**
-     * @param userAccount 账号
-     * @param userPassword 用户密码
+     * @param userAccount   账号
+     * @param userPassword  用户密码
      * @param checkPassword 确认密码
      * @return 用户ID
      */
     long userRegister(String userAccount, String userPassword, String checkPassword);
 
     /**
-     * @param userAccount 账号
+     * @param userAccount  账号
      * @param userPassword 用户密码
      * @param request
      * @return 用户信息
@@ -35,6 +35,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取当前登录用户
+     *
      * @param request HTTP请求对象
      * @return 当前登录用户
      */
@@ -42,20 +43,23 @@ public interface UserService extends IService<User> {
 
     /**
      * 用户登出
+     *
      * @param request HTTP请求对象
      * @return 登出成功
      */
     boolean userLogout(HttpServletRequest request);
 
     /**
-     * 获取脱敏的登录用户信息     
+     * 获取脱敏的登录用户信息
+     *
      * @param user 用户
      * @return 脱敏的登录用户信息
      */
     LoginUserVO getLoginUserVO(User user);
 
     /**
-     * 获取脱敏的用户信息     
+     * 获取脱敏的用户信息
+     *
      * @param user 用户
      * @return 脱敏的用户信息
      */
@@ -63,6 +67,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 获取脱敏的用户信息列表
+     *
      * @param userList 用户列表
      * @return 脱敏的用户信息列表
      */
@@ -70,6 +75,7 @@ public interface UserService extends IService<User> {
 
     /**
      * 根据查询条件构造QueryWrapper
+     *
      * @param userQueryRequest 用户查询请求参数
      * @return QueryWrapper<User> 查询包装器
      */
@@ -78,8 +84,9 @@ public interface UserService extends IService<User> {
 
     /**
      * 是否为管理员
+     *
      * @param request HTTP请求对象
      * @return 是否为管理员
-     */    
+     */
     boolean isAdmin(User user);
 }

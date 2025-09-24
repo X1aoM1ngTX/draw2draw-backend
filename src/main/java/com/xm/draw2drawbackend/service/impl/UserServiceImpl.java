@@ -26,19 +26,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
-* @author X1aoM1ngTX
-* @description 针对表【user(用户)】的数据库操作Service实现
-* @createDate 2025-09-18 14:44:18
-*/
+ * @author X1aoM1ngTX
+ * @description 针对表【user(用户)】的数据库操作Service实现
+ * @createDate 2025-09-18 14:44:18
+ */
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
-    implements UserService{
+        implements UserService {
 
     /**
      * 用户注册
-     * @param userAccount 账号
-     * @param userPassword 用户密码
+     *
+     * @param userAccount   账号
+     * @param userPassword  用户密码
      * @param checkPassword 确认密码
      * @return 用户ID
      */
@@ -71,9 +72,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 用户登录
-     * @param userAccount 账号
+     *
+     * @param userAccount  账号
      * @param userPassword 用户密码
-     * @param request Http请求
+     * @param request      Http请求
      * @return 用户信息
      */
     @Override
@@ -102,6 +104,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取当前登录用户
+     *
      * @param request Http请求
      * @return
      */
@@ -109,7 +112,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User getLoginUser(HttpServletRequest request) {
         // 先判断是否已登录
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
-        User currentUser = (User)userObj;
+        User currentUser = (User) userObj;
         ThrowUtils.throwIf(currentUser == null || currentUser.getId() == null, ErrorCode.NOT_LOGIN, "用户未登录");
         // 从数据库查询（追求性能的话可以注释，直接走缓存,但是有可能不是最新数据）
         Long userId = currentUser.getId();
@@ -120,8 +123,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 用户登出
+     *
      * @param request Http请求
-     * @return 
+     * @return
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
@@ -133,6 +137,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取脱敏的用户信息
+     *
      * @param user
      * @return 登录用户信息
      */
@@ -146,6 +151,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取脱敏的用户信息
+     *
      * @param user
      * @return 用户信息
      */
@@ -159,6 +165,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取脱敏的用户信息列表
+     *
      * @param userList 用户列表
      * @return 脱敏的用户信息列表
      */
@@ -174,6 +181,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取查询包装类
+     *
      * @param userQueryRequest
      * @return 查询包装类
      */
@@ -202,6 +210,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 判断当前用户是否为管理员
+     *
      * @param user 用户
      * @return true: 管理员，false: 不是管理员
      */

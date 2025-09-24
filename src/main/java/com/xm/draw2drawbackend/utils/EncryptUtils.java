@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 加密工具类
  * 基于 Hutool 提供多种加密算法支持
- * 
+ *
  * @author X1aoM1ngTX
  */
 @Slf4j
@@ -34,7 +34,7 @@ public class EncryptUtils {
 
     /**
      * MD5加密
-     * 
+     *
      * @param data 待加密数据
      * @return MD5加密结果
      */
@@ -45,7 +45,7 @@ public class EncryptUtils {
 
     /**
      * MD5加盐加密
-     * 
+     *
      * @param data 待加密数据
      * @param salt 盐值
      * @return MD5加盐加密结果
@@ -58,7 +58,7 @@ public class EncryptUtils {
 
     /**
      * SHA256加密
-     * 
+     *
      * @param data 待加密数据
      * @return SHA256加密结果
      */
@@ -69,7 +69,7 @@ public class EncryptUtils {
 
     /**
      * SHA256加盐加密
-     * 
+     *
      * @param data 待加密数据
      * @param salt 盐值
      * @return SHA256加盐加密结果
@@ -84,7 +84,7 @@ public class EncryptUtils {
 
     /**
      * AES加密（使用默认密钥）
-     * 
+     *
      * @param data 待加密数据
      * @return AES加密结果（Base64编码）
      */
@@ -94,9 +94,9 @@ public class EncryptUtils {
 
     /**
      * AES加密
-     * 
+     *
      * @param data 待加密数据
-     * @param key 密钥（16位）
+     * @param key  密钥（16位）
      * @return AES加密结果（Base64编码）
      */
     public static String aesEncrypt(String data, String key) {
@@ -112,7 +112,7 @@ public class EncryptUtils {
 
     /**
      * AES解密（使用默认密钥）
-     * 
+     *
      * @param encryptedData 加密数据（Base64编码）
      * @return 解密结果
      */
@@ -122,9 +122,9 @@ public class EncryptUtils {
 
     /**
      * AES解密
-     * 
+     *
      * @param encryptedData 加密数据（Base64编码）
-     * @param key 密钥（16位）
+     * @param key           密钥（16位）
      * @return 解密结果
      */
     public static String aesDecrypt(String encryptedData, String key) {
@@ -140,9 +140,9 @@ public class EncryptUtils {
 
     /**
      * DES加密
-     * 
+     *
      * @param data 待加密数据
-     * @param key 密钥（8位）
+     * @param key  密钥（8位）
      * @return DES加密结果（Base64编码）
      */
     public static String desEncrypt(String data, String key) {
@@ -158,9 +158,9 @@ public class EncryptUtils {
 
     /**
      * DES解密
-     * 
+     *
      * @param encryptedData 加密数据（Base64编码）
-     * @param key 密钥（8位）
+     * @param key           密钥（8位）
      * @return 解密结果
      */
     public static String desDecrypt(String encryptedData, String key) {
@@ -178,7 +178,7 @@ public class EncryptUtils {
 
     /**
      * 生成RSA密钥对
-     * 
+     *
      * @return RSA密钥对 [0]私钥 [1]公钥
      */
     public static String[] generateRSAKeyPair() {
@@ -195,8 +195,8 @@ public class EncryptUtils {
 
     /**
      * RSA公钥加密
-     * 
-     * @param data 待加密数据
+     *
+     * @param data      待加密数据
      * @param publicKey 公钥
      * @return RSA加密结果（Base64编码）
      */
@@ -213,9 +213,9 @@ public class EncryptUtils {
 
     /**
      * RSA私钥解密
-     * 
+     *
      * @param encryptedData 加密数据（Base64编码）
-     * @param privateKey 私钥
+     * @param privateKey    私钥
      * @return 解密结果
      */
     public static String rsaDecryptByPrivateKey(String encryptedData, String privateKey) {
@@ -231,8 +231,8 @@ public class EncryptUtils {
 
     /**
      * RSA私钥加密（用于数字签名）
-     * 
-     * @param data 待加密数据
+     *
+     * @param data       待加密数据
      * @param privateKey 私钥
      * @return RSA加密结果（Base64编码）
      */
@@ -249,9 +249,9 @@ public class EncryptUtils {
 
     /**
      * RSA公钥解密（用于验证数字签名）
-     * 
+     *
      * @param encryptedData 加密数据（Base64编码）
-     * @param publicKey 公钥
+     * @param publicKey     公钥
      * @return 解密结果
      */
     public static String rsaDecryptByPublicKey(String encryptedData, String publicKey) {
@@ -269,7 +269,7 @@ public class EncryptUtils {
 
     /**
      * 生成安全的密码哈希（推荐用于用户密码加密）
-     * 
+     *
      * @param password 原始密码
      * @return 加密后的密码（SHA256 + 盐值）
      */
@@ -279,8 +279,8 @@ public class EncryptUtils {
 
     /**
      * 验证密码
-     * 
-     * @param inputPassword 用户输入的密码
+     *
+     * @param inputPassword  用户输入的密码
      * @param storedPassword 存储的加密密码
      * @return 是否匹配
      */
@@ -294,7 +294,7 @@ public class EncryptUtils {
 
     /**
      * 生成随机盐值
-     * 
+     *
      * @param length 盐值长度
      * @return 随机盐值
      */

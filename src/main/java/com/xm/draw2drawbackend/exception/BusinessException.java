@@ -27,7 +27,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * 构造函数
-     * 
+     *
      * @param errorCode 错误码
      */
     public BusinessException(ErrorCode errorCode) {
@@ -38,7 +38,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * 构造函数
-     * 
+     *
      * @param code    错误码
      * @param message 错误信息
      */
@@ -50,7 +50,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * 构造函数
-     * 
+     *
      * @param errorCode   错误码
      * @param description 描述
      */
@@ -62,7 +62,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * 构造函数
-     * 
+     *
      * @param errorCode   错误码
      * @param description 描述
      */

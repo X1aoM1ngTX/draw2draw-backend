@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * 权限拦截器
+ *
  * @author X1aoM1ngTX
  */
 // 标记此类为切面类，用于实现AOP功能
@@ -60,7 +61,8 @@ public class AuthInterceptor {
         // 如果用户角色不存在，抛出无权限异常
         ThrowUtils.throwIf(userRoleEnum == null, ErrorCode.NO_AUTH);
         // 如果要求管理员权限但用户不是管理员，抛出无权限异常
-        ThrowUtils.throwIf(UserRoleEnum.ADMIN.equals(mustRoleEnum) && !UserRoleEnum.ADMIN.equals(userRoleEnum), ErrorCode.NO_AUTH);
+        ThrowUtils.throwIf(UserRoleEnum.ADMIN.equals(mustRoleEnum) && !UserRoleEnum.ADMIN.equals(userRoleEnum),
+                ErrorCode.NO_AUTH);
         // 所有权限检查通过，放行执行目标方法
         return joinPoint.proceed();
     }

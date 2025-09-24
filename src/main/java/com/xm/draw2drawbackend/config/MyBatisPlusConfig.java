@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * MyBatis-Plus配置类
+ *
  * @author X1aoM1ngTX
  */
 @Configuration

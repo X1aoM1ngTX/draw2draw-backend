@@ -1,8 +1,8 @@
 package com.xm.draw2drawbackend.model.vo;
 
-import java.util.List;
-
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class PictureTagCategory {

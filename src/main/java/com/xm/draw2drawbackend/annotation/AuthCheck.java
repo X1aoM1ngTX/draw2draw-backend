@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 权限校验注解
+ *
  * @author X1aoM1ngTX
  */
 @Target(ElementType.METHOD)
