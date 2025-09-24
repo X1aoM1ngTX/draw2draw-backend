@@ -2,7 +2,7 @@ package com.xm.draw2drawbackend.exception;
 
 import lombok.Getter;
 
-import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 自定义业务异常类
@@ -10,9 +10,8 @@ import java.io.Serial;
  * @author X1aoM1ngTX
  */
 @Getter
-public class BusinessException extends RuntimeException {
+public class BusinessException extends RuntimeException implements Serializable {
 
-    @Serial
     private static final long serialVersionUID = -7034897190745766939L;
 
     /**

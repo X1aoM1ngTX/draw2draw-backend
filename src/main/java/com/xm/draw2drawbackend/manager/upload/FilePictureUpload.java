@@ -28,7 +28,7 @@ public class FilePictureUpload extends PictureUploadTemplate {
         // 1. 校验文件大小
         long fileSize = multipartFile.getSize();
         final long _1MB = 1024 * 1024L;
-        ThrowUtils.throwIf(fileSize > 2 * _1MB, ErrorCode.PARAMS_ERROR, "文件大小不能超过 2M");
+        ThrowUtils.throwIf(fileSize > 5 * _1MB, ErrorCode.PARAMS_ERROR, "文件大小不能超过 5M");
         // 2. 校验文件后缀
         String fileSuffix = FileUtil.getSuffix(multipartFile.getOriginalFilename());
         // 允许上传的文件后缀

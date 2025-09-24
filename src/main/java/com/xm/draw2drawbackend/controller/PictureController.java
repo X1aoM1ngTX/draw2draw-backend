@@ -71,6 +71,20 @@ public class PictureController {
     }
 
     /**
+     * 批量爬取并创建图片
+     */
+    @PostMapping("/upload/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Integer> uploadPictureByBatch(
+            @RequestBody PictureUploadByBatchRequest pictureUploadByBatchRequest,
+            HttpServletRequest request) {
+                ThrowUtils.throwIf(pictureUploadByBatchRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        Integer uploadCount = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
+        return ResultUtils.success(uploadCount);
+    }
+
+    /**
      * 删除图片
      */
     @PostMapping("/delete")

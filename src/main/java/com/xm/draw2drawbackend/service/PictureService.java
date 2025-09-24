@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
+import com.xm.draw2drawbackend.model.dto.picture.PictureUploadByBatchRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureUploadRequest;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.User;
@@ -30,14 +31,25 @@ public interface PictureService extends IService<Picture> {
     /**
      * 上传图片
      *
-     * @param multipartFile         图片文件
-     * @param pictureUploadRequest  上传图片参数
-     * @param loginUser             登录用户
+     * @param multipartFile        图片文件
+     * @param pictureUploadRequest 上传图片参数
+     * @param loginUser            登录用户
      * @return
      */
     PictureVO uploadPicture(Object inputSource,
-                            PictureUploadRequest pictureUploadRequest,
-                            User loginUser);
+            PictureUploadRequest pictureUploadRequest,
+            User loginUser);
+
+    /**
+     * 批量抓取和创建图片
+     * 
+     * @param pictureUploadByBatchRequest
+     * @param loginUser
+     * @return 成功创建的图片数
+     */
+    Integer uploadPictureByBatch(
+            PictureUploadByBatchRequest pictureUploadByBatchRequest,
+            User loginUser);
 
     /**
      * 根据查询条件构造QueryWrapper
@@ -50,18 +62,18 @@ public interface PictureService extends IService<Picture> {
     /**
      * 获取图片VO
      *
-     * @param picture       图片实体
-     * @param request       HTTP请求对象
-     * @return PictureVO    图片VO
+     * @param picture 图片实体
+     * @param request HTTP请求对象
+     * @return PictureVO 图片VO
      */
     PictureVO getPictureVO(Picture picture, HttpServletRequest request);
 
     /**
      * 分页获取图片封装
      *
-     * @param picturePage       图片分页对象
-     * @param request           HTTP请求对象
-     * @return Page<PictureVO>  图片VO分页对象
+     * @param picturePage 图片分页对象
+     * @param request     HTTP请求对象
+     * @return Page<PictureVO> 图片VO分页对象
      */
     Page<PictureVO> getPictureVOPage(Page<Picture> picturePage, HttpServletRequest request);
 
@@ -72,7 +84,6 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser            登录用户
      */
     void doPictureReview(PictureReviewRequest pictureReviewRequest, User loginUser);
-
 
     /**
      * 填充审核参数

@@ -3,9 +3,12 @@ package com.xm.draw2drawbackend.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import lombok.extern.slf4j.Slf4j;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
 import com.xm.draw2drawbackend.manager.FileManager;
@@ -16,6 +19,7 @@ import com.xm.draw2drawbackend.mapper.PictureMapper;
 import com.xm.draw2drawbackend.model.dto.file.UploadPictureResult;
 import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
+import com.xm.draw2drawbackend.model.dto.picture.PictureUploadByBatchRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureUploadRequest;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.User;
@@ -24,11 +28,18 @@ import com.xm.draw2drawbackend.model.vo.PictureVO;
 import com.xm.draw2drawbackend.model.vo.UserVO;
 import com.xm.draw2drawbackend.service.PictureService;
 import com.xm.draw2drawbackend.service.UserService;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +51,7 @@ import java.util.stream.Collectors;
  * @description 针对表【picture(图片)】的数据库操作Service实现
  * @createDate 2025-09-20 12:05:51
  */
+@Slf4j
 @Service
 public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> implements PictureService {
 
@@ -78,7 +90,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             ThrowUtils.throwIf(introduction.length() > 800, ErrorCode.PARAMS_ERROR, "简介过长");
         }
     }
-
 
     /**
      * 上传图片
@@ -119,7 +130,12 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         // 构造要入库的图片信息
         Picture picture = new Picture();
         picture.setUrl(uploadPictureResult.getUrl());
-        picture.setName(uploadPictureResult.getPicName());
+        String picName = uploadPictureResult.getPicName();
+        // 如果 pictureUploadRequest 中有 picName，则使用它
+        if (pictureUploadRequest != null && StrUtil.isNotBlank(pictureUploadRequest.getPicName())) {
+            picName = pictureUploadRequest.getPicName();
+        }
+        picture.setName(picName);
         picture.setPicSize(uploadPictureResult.getPicSize());
         picture.setPicWidth(uploadPictureResult.getPicWidth());
         picture.setPicHeight(uploadPictureResult.getPicHeight());
@@ -142,10 +158,107 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     }
 
     /**
+     * 批量上传图片
+     *
+     * @param pictureUploadByBatchRequest 批量上传图片参数
+     * @param loginUser                   登录用户
+     */
+    @Override
+    public Integer uploadPictureByBatch(PictureUploadByBatchRequest pictureUploadByBatchRequest, User loginUser) {
+        // 参数校验
+        String searchText = pictureUploadByBatchRequest.getSearchText();
+        Integer count = pictureUploadByBatchRequest.getCount();
+        // 图片名称前缀，默认值为 "bing_{searchText}_"
+        String namePrefix = pictureUploadByBatchRequest.getNamePrefix();
+        if (StrUtil.isBlank(namePrefix)) {
+            namePrefix = "bing_" + searchText + "_";
+        }
+        ThrowUtils.throwIf(StrUtil.isBlank(searchText), ErrorCode.PARAMS_ERROR, "搜索关键词不能为空");
+        ThrowUtils.throwIf(count == null || count <= 0, ErrorCode.PARAMS_ERROR, "数量必须大于0");
+        ThrowUtils.throwIf(count > 30, ErrorCode.PARAMS_ERROR, "最多 30 条");
+
+        log.info("开始批量上传图片，搜索关键词: {}, 数量: {}, 名称前缀: {}", searchText, count, namePrefix);
+
+        // 要抓取的地址
+        String fetchUrl = String.format("https://cn.bing.com/images/async?q=%s&mmasync=1", searchText);
+        Document document;
+        try {
+            document = Jsoup.connect(fetchUrl)
+                    .timeout(10000) // 设置10秒超时
+                    .get();
+        } catch (IOException e) {
+            log.error("获取页面失败, URL: " + fetchUrl, e);
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "获取页面失败");
+        }
+
+        Element div = document.getElementsByClass("dgControl").first();
+        if (ObjUtil.isNull(div)) {
+            log.error("获取元素失败，页面结构可能已变化");
+            throw new BusinessException(ErrorCode.OPERATION_ERROR, "获取元素失败，页面结构可能已变化");
+        }
+
+        Elements imgElementList = div.select("img.mimg");
+        if (CollUtil.isEmpty(imgElementList)) {
+            log.warn("未找到任何图片元素");
+            return 0;
+        }
+
+        int uploadCount = 0;
+        int failCount = 0;
+        Set<String> processedUrls = new java.util.HashSet<>(); // 用于去重
+
+        for (Element imgElement : imgElementList) {
+            String fileUrl = imgElement.attr("src");
+            if (StrUtil.isBlank(fileUrl)) {
+                log.info("当前链接为空，已跳过");
+                continue;
+            }
+
+            // 处理图片上传地址，防止出现转义问题
+            int questionMarkIndex = fileUrl.indexOf("?");
+            if (questionMarkIndex > -1) {
+                fileUrl = fileUrl.substring(0, questionMarkIndex);
+            }
+
+            // 去重处理
+            if (processedUrls.contains(fileUrl)) {
+                log.info("重复URL，已跳过: {}", fileUrl);
+                continue;
+            }
+            processedUrls.add(fileUrl);
+
+            // 上传图片
+            PictureUploadRequest pictureUploadRequest = new PictureUploadRequest();
+            pictureUploadRequest.setFileUrl(fileUrl);
+            pictureUploadRequest.setPicName(searchText + " " + namePrefix + " " + (uploadCount + 1));
+            try {
+                PictureVO pictureVO = this.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+                log.info("图片上传成功, id = {}, URL: {}", pictureVO.getId(), fileUrl);
+                uploadCount++;
+            } catch (BusinessException e) {
+                log.error("图片上传失败, URL: " + fileUrl + ", 错误码: " + e.getCode() + ", 错误信息: " + e.getMessage());
+                failCount++;
+                continue;
+            } catch (Exception e) {
+                log.error("图片上传失败, URL: " + fileUrl, e);
+                failCount++;
+                continue;
+            }
+            // 跳出循环
+            if (uploadCount >= count) {
+                break;
+            }
+        }
+
+        log.info("批量上传完成，成功: {}, 失败: {}, 总计: {}", uploadCount, failCount, imgElementList.size());
+        return uploadCount;
+    }
+
+    /**
      * 获取查询包装类
      *
      * @param pictureQueryRequest 查询参数
-     * @return  查询包装类
+     * @return 查询包装类
      */
     @Override
     public QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest) {
@@ -174,11 +287,10 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         // 从多字段中搜索
         // and (name like '%searchText%' or introduction like '%searchText%')
         if (StrUtil.isNotBlank(searchText)) {
-            // 需要拼接查询条件  
+            // 需要拼接查询条件
             queryWrapper.and(qw -> qw.like("name", searchText)
                     .or()
-                    .like("introduction", searchText)
-            );
+                    .like("introduction", searchText));
         }
         queryWrapper.eq(ObjUtil.isNotEmpty(id), "id", id);
         queryWrapper.eq(ObjUtil.isNotEmpty(userId), "userId", userId);
@@ -194,7 +306,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         queryWrapper.like(StrUtil.isNotBlank(reviewMessage), "reviewMessage", reviewMessage);
         queryWrapper.eq(ObjUtil.isNotEmpty(reviewerId), "reviewerId", reviewerId);
 
-        // JSON 数组查询  
+        // JSON 数组查询
         // and tags like '%\"Java\"%' and tags like '%\"TypeScript\"%'
         if (CollUtil.isNotEmpty(tags)) {
             for (String tag : tags) {
@@ -210,9 +322,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     /**
      * 获取图片VO
      *
-     * @param picture   图片实体
-     * @param request   HTTP请求对象
-     * @return          图片VO
+     * @param picture 图片实体
+     * @param request HTTP请求对象
+     * @return 图片VO
      */
     @Override
     public PictureVO getPictureVO(Picture picture, HttpServletRequest request) {
@@ -242,7 +354,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     public Page<PictureVO> getPictureVOPage(Page<Picture> picturePage, HttpServletRequest request) {
         // 初始化分页对象
         List<Picture> pictureList = picturePage.getRecords();
-        Page<PictureVO> pictureVOPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(), picturePage.getTotal());
+        Page<PictureVO> pictureVOPage = new Page<>(picturePage.getCurrent(), picturePage.getSize(),
+                picturePage.getTotal());
         // 空数据检查
         if (CollUtil.isEmpty(pictureList)) {
             return pictureVOPage;
@@ -322,5 +435,4 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             picture.setReviewStatus(PictureReviewStatusEnum.REVIEWING.getValue());
         }
     }
-
 }
