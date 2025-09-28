@@ -21,7 +21,7 @@ create table if not exists user
     -- inviteUser bigint default null comment '邀请用户id',
     UNIQUE KEY uk_userAccount (userAccount),
     -- UNIQUE KEY uk_shareCode (shareCode),
-    INDEX idx_userName (userName),
+    INDEX idx_userName (userName)
     -- INDEX idx_inviteUser (inviteUser),
     -- INDEX idx_vipExpireTime (vipExpireTime)
 ) comment '用户' collate = utf8mb4_unicode_ci;

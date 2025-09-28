@@ -1,23 +1,14 @@
 package com.xm.draw2drawbackend.model.dto.space;
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
- * 空间
- * @TableName space
+ * 空间创建请求
  */
-@TableName(value ="space")
 @Data
-public class AddSpaceRequest implements Serializable {
-    /**
-     * id
-     */
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+public class SpaceAddRequest implements Serializable {
 
     /**
      * 空间名称
@@ -29,52 +20,5 @@ public class AddSpaceRequest implements Serializable {
      */
     private Integer spaceLevel;
 
-    /**
-     * 空间图片的最大总大小
-     */
-    private Long maxSize;
-
-    /**
-     * 空间图片的最大数量
-     */
-    private Long maxCount;
-
-    /**
-     * 当前空间下图片的总大小
-     */
-    private Long totalSize;
-
-    /**
-     * 当前空间下的图片数量
-     */
-    private Long totalCount;
-
-    /**
-     * 创建用户 id
-     */
-    private Long userId;
-
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-
-    /**
-     * 编辑时间
-     */
-    private Date editTime;
-
-    /**
-     * 更新时间
-     */
-    private Date updateTime;
-
-    /**
-     * 是否删除
-     */
-    @TableLogic
-    private Integer isDelete;
-
-    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

@@ -4,12 +4,14 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author X1aoM1ngTX
  */
 @SpringBootApplication
 @MapperScan("com.xm.draw2drawbackend.mapper")
+@EnableAsync
 @EnableAspectJAutoProxy(exposeProxy = true)
 public class Draw2drawBackendApplication {
 

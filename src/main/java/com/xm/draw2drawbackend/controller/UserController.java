@@ -8,7 +8,7 @@ import com.xm.draw2drawbackend.common.ResultUtils;
 import com.xm.draw2drawbackend.constant.UserConstant;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.manager.FileManager;
+import com.xm.draw2drawbackend.manager.upload.FilePictureUpload;
 import com.xm.draw2drawbackend.model.dto.file.UploadPictureResult;
 import com.xm.draw2drawbackend.model.dto.user.*;
 import com.xm.draw2drawbackend.model.entity.User;
@@ -36,7 +36,7 @@ public class UserController {
     private UserService userService;
 
     @Resource
-    private FileManager fileManager;
+    private FilePictureUpload filePictureUpload;
 
     /**
      * 用户注册
@@ -180,17 +180,23 @@ public class UserController {
         
         // 上传头像，按照用户 id 划分目录
         String uploadPathPrefix = String.format("public/avatar/%s", loginUser.getId());
-        UploadPictureResult uploadPictureResult = fileManager.uploadPicture(multipartFile, uploadPathPrefix);
-        String avatarUrl = uploadPictureResult.getUrl();
+        UploadPictureResult uploadPictureResult = filePictureUpload.uploadPicture(multipartFile, uploadPathPrefix);
+        
+        // 使用UploadPictureResult中的缩略图URL（如果存在）
+        String finalAvatarUrl = uploadPictureResult.getThumbnailUrl();
+        // 如果缩略图URL不存在，则使用原图URL
+        if (finalAvatarUrl == null || finalAvatarUrl.isEmpty()) {
+            finalAvatarUrl = uploadPictureResult.getUrl();
+        }
         
         // 更新用户头像
         User updateUser = new User();
         updateUser.setId(loginUser.getId());
-        updateUser.setUserAvatar(avatarUrl);
+        updateUser.setUserAvatar(finalAvatarUrl);
         boolean result = userService.updateById(updateUser);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "头像更新失败");
         
-        return ResultUtils.success(avatarUrl);
+        return ResultUtils.success(finalAvatarUrl);
     }
 
     

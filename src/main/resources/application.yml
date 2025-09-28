@@ -17,6 +17,10 @@ spring:
     host: localhost
     port: 6379
     timeout: 5000
+  # Session 配置
+  session:
+    store-type: redis
+    timeout: 2592000
   # 配置文件上传大小限制
   servlet:
     multipart:
@@ -26,6 +30,9 @@ server:
   port: 8090
   servlet:
     context-path: /api
+    session:
+      cookie:
+        max-age: 2592000
 
 mybatis-plus:
   global-config:

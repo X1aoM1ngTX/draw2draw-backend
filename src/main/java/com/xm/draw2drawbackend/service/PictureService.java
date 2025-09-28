@@ -91,4 +91,11 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser 登录用户
      */
     void fillReviewParams(Picture picture, User loginUser);
+
+    /**
+     * 清理图片文件
+     *
+     * @param oldPicture 旧图片实体
+     */
+    void clearPictureFile(Picture oldPicture);
 }
