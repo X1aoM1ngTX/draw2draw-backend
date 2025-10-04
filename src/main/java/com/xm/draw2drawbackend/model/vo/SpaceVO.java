@@ -69,6 +69,11 @@ public class SpaceVO implements Serializable {
      */
     private UserVO user;
 
+    /**
+     * 空间 id
+     */
+    private Long spaceId;
+
     private static final long serialVersionUID = 1L;
 
     /**

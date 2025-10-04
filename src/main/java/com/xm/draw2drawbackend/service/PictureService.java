@@ -3,6 +3,7 @@ package com.xm.draw2drawbackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xm.draw2drawbackend.model.dto.picture.PictureEditRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureUploadByBatchRequest;
@@ -36,8 +37,8 @@ public interface PictureService extends IService<Picture> {
      * @return
      */
     PictureVO uploadPicture(Object inputSource,
-                            PictureUploadRequest pictureUploadRequest,
-                            User loginUser);
+            PictureUploadRequest pictureUploadRequest,
+            User loginUser);
 
     /**
      * 批量抓取和创建图片
@@ -98,4 +99,28 @@ public interface PictureService extends IService<Picture> {
      * @param oldPicture 旧图片实体
      */
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 校验图片权限
+     *
+     * @param loginUser 登录用户
+     * @param picture   图片实体
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
+
+    /**
+     * 删除图片
+     *
+     * @param pictureId 图片ID
+     * @param loginUser 登录用户
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 编辑图片
+     *
+     * @param pictureEditRequest 图片编辑参数
+     * @param loginUser          登录用户
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
 }
