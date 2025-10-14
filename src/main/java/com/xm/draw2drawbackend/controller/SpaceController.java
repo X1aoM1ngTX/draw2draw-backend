@@ -14,9 +14,9 @@ import com.xm.draw2drawbackend.model.dto.space.SpaceEditRequest;
 import com.xm.draw2drawbackend.model.dto.space.SpaceLevel;
 import com.xm.draw2drawbackend.model.dto.space.SpaceQueryRequest;
 import com.xm.draw2drawbackend.model.dto.space.SpaceUpdateRequest;
-import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
+import com.xm.draw2drawbackend.manager.SpacePictureManager;
 import com.xm.draw2drawbackend.model.enums.SpaceLevelEnum;
 import com.xm.draw2drawbackend.model.vo.SpaceVO;
 import com.xm.draw2drawbackend.service.SpaceService;
@@ -50,6 +50,9 @@ public class SpaceController {
     @Resource
     private SpaceService spaceService;
 
+    @Resource
+    private SpacePictureManager spacePictureManager;
+
     // @Resource
     // private SpaceUserAuthManager spaceUserAuthManager;
 
@@ -58,7 +61,7 @@ public class SpaceController {
      */
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
-        ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
         User loginUser = userService.getLoginUser(request);
         long newId = spaceService.addSpace(spaceAddRequest, loginUser);
         return ResultUtils.success(newId);
@@ -71,7 +74,7 @@ public class SpaceController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteSpace(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         // 参数校验
-        ThrowUtils.throwIf(deleteRequest == null || deleteRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(deleteRequest == null || deleteRequest.getId() <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
         // 获取当前登录用户
         User loginUser = userService.getLoginUser(request);
         Long id = deleteRequest.getId();
@@ -82,9 +85,8 @@ public class SpaceController {
         if (!oldSpace.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             ThrowUtils.throwIf(true, ErrorCode.NO_AUTH, "无权限删除");
         }
-        // 操作数据库
-        boolean result = spaceService.removeById(id);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        // 删除空间及其关联的图片
+        spacePictureManager.deleteSpaceAndPictures(id, loginUser);
         return ResultUtils.success(true);
     }
 
@@ -96,7 +98,7 @@ public class SpaceController {
     public BaseResponse<Boolean> updateSpace(@RequestBody SpaceUpdateRequest spaceUpdateRequest,
             HttpServletRequest request) {
         if (spaceUpdateRequest == null || spaceUpdateRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数错误");
         }
         // 将实体类和 DTO 进行转换
         Space space = new Space();
@@ -108,10 +110,10 @@ public class SpaceController {
         // 判断是否存在
         long id = spaceUpdateRequest.getId();
         Space oldSpace = spaceService.getById(id);
-        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         // 操作数据库
         boolean result = spaceService.updateById(space);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "更新失败");
         return ResultUtils.success(true);
     }
 
@@ -121,10 +123,10 @@ public class SpaceController {
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Space> getSpaceById(long id, HttpServletRequest request) {
-        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
+        ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
         // 查询数据库
         Space space = spaceService.getById(id);
-        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         // 获取封装类
         return ResultUtils.success(space);
     }
@@ -137,7 +139,7 @@ public class SpaceController {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         // 查询数据库
         Space space = spaceService.getById(id);
-        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         // SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
         // User loginUser = userService.getLoginUser(request);
         // List<String> permissionList = spaceUserAuthManager.getPermissionList(space,
@@ -183,9 +185,9 @@ public class SpaceController {
      */
     @PostMapping("/edit")
     public BaseResponse<Boolean> editSpace(@RequestBody SpaceEditRequest spaceEditRequest, HttpServletRequest request) {
-        if (spaceEditRequest == null || spaceEditRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR);
-        }
+        ThrowUtils.throwIf(spaceEditRequest == null || spaceEditRequest.getId() <= 0,
+                ErrorCode.PARAMS_ERROR,
+                "参数错误");
         // 在此处将实体类和 DTO 进行转换
         Space space = new Space();
         BeanUtils.copyProperties(spaceEditRequest, space);
@@ -199,7 +201,7 @@ public class SpaceController {
         // 判断是否存在
         long id = spaceEditRequest.getId();
         Space oldSpace = spaceService.getById(id);
-        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         // 仅本人或管理员可编辑
         if (!oldSpace.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             ThrowUtils.throwIf(true, ErrorCode.NO_AUTH, "无权限删除");

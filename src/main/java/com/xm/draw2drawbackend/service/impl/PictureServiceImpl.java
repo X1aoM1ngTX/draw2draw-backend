@@ -605,12 +605,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         });
         // 异步清理文件
         this.clearPictureFile(oldPicture);
-
-        // 操作数据库
-        boolean result = this.removeById(pictureId);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "删除失败");
-        // 异步清理文件
-        this.clearPictureFile(oldPicture);
     }
 
     /**

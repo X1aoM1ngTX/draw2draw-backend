@@ -10,7 +10,6 @@ import com.xm.draw2drawbackend.common.BaseResponse;
 import com.xm.draw2drawbackend.common.DeleteRequest;
 import com.xm.draw2drawbackend.common.ResultUtils;
 import com.xm.draw2drawbackend.constant.UserConstant;
-import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
 import com.xm.draw2drawbackend.model.dto.picture.*;
@@ -121,12 +120,16 @@ public class PictureController {
 
     /**
      * 更新图片（仅管理员可用）
+     *
+     * @param pictureUpdateRequest
+     * @param request
+     * @return
      */
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest,
-            HttpServletRequest request) {
-        ThrowUtils.throwIf(pictureUpdateRequest == null || pictureUpdateRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
+                                               HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureUpdateRequest == null || pictureUpdateRequest.getId() <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
         // 将实体类和 DTO 进行转换
         Picture picture = new Picture();
         BeanUtils.copyProperties(pictureUpdateRequest, picture);
@@ -251,8 +254,8 @@ public class PictureController {
         String cachedValue = LOCAL_CACHE.getIfPresent(cacheKey);
         if (cachedValue != null) {
             // 如果命中缓存,就返回结果
-            Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
-            return ResultUtils.success(cachePage);
+            Page<PictureVO> cachedPage = JSONUtil.toBean(cachedValue, Page.class);
+            return ResultUtils.success(cachedPage);
         }
         // 2. 本地缓存未命中，查询 Redis 缓存
         ValueOperations<String, String> opsForValue = stringRedisTemplate.opsForValue();
@@ -260,8 +263,8 @@ public class PictureController {
         if (cachedValue != null) {
             // 如果命中 Redis 缓存,就返回结果并写入本地缓存
             LOCAL_CACHE.put(cacheKey, cachedValue);
-            Page<PictureVO> cachePage = JSONUtil.toBean(cachedValue, Page.class);
-            return ResultUtils.success(cachePage);
+            Page<PictureVO> cachedPage = JSONUtil.toBean(cachedValue, Page.class);
+            return ResultUtils.success(cachedPage);
         }
         // 3. 缓存都未命中，则查询数据库，并更新本地和 Redis 缓存
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size),

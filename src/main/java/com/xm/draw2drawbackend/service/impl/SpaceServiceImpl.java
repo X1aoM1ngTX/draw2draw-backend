@@ -9,7 +9,6 @@ import com.xm.draw2drawbackend.exception.ThrowUtils;
 import com.xm.draw2drawbackend.mapper.SpaceMapper;
 import com.xm.draw2drawbackend.model.dto.space.SpaceAddRequest;
 import com.xm.draw2drawbackend.model.dto.space.SpaceQueryRequest;
-import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.enums.SpaceLevelEnum;
