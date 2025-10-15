@@ -46,6 +46,8 @@ mybatis-plus:
     map-underscore-to-camel-case: false
     # 开启打印 SQL
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  # 指定mapper xml文件的位置
+  mapper-locations: classpath*:generator/mapper/*.xml
 
 knife4j:
   enable: true

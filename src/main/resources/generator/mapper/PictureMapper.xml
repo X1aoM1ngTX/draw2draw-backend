@@ -27,12 +27,14 @@
             <result property="reviewTime" column="reviewTime" jdbcType="TIMESTAMP"/>
             <result property="thumbnailUrl" column="thumbnailUrl" jdbcType="VARCHAR"/>
             <result property="spaceId" column="spaceId" jdbcType="BIGINT"/>
+            <result property="picColor" column="picColor" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,url,name,introduction,category,tags,
-        picSize,picWidth,picHeight,picScale,picFormat,
-        userId,createTime,editTime,updateTime,isDelete,
-        reviewStatus,reviewMessage,reviewerId,reviewTime,thumbnailUrl,spaceId
+        id,url,name,introduction,category,
+        tags,picSize,picWidth,picHeight,picScale,
+        picFormat,userId,createTime,editTime,updateTime,
+        isDelete,reviewStatus,reviewMessage,reviewerId,
+        reviewTime,thumbnailUrl,spaceId,picColor
     </sql>
 </mapper>

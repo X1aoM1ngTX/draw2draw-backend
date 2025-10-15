@@ -14,7 +14,7 @@ import java.util.Date;
 @TableName(value = "picture")
 @Data
 public class Picture implements Serializable {
-    
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
@@ -114,7 +114,7 @@ public class Picture implements Serializable {
      * 审核人 ID
      */
     private Long reviewerId;
-    
+
     /**
      * 审核时间
      */
@@ -129,4 +129,9 @@ public class Picture implements Serializable {
      * 空间 id
      */
     private Long spaceId;
+
+    /**
+     * 图片主色调
+     */
+    private String picColor;
 }

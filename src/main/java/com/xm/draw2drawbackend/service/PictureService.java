@@ -3,6 +3,7 @@ package com.xm.draw2drawbackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xm.draw2drawbackend.model.dto.picture.PictureEditByBatchRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureEditRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
@@ -12,6 +13,8 @@ import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.PictureVO;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -20,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
  * @createDate 2025-09-20 12:05:51
  */
 public interface PictureService extends IService<Picture> {
-
     /**
      * 校验图片参数
      *
@@ -123,4 +125,22 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser          登录用户
      */
     void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 根据颜色搜索图片
+     *
+     * @param spaceId   空间ID
+     * @param picColor  图片颜色
+     * @param loginUser 登录用户
+     * @return 图片VO列表
+     */
+    List<PictureVO> searchPictureByColor(Long spaceId, String picColor, User loginUser);
+
+    /**
+     * 批量编辑图片
+     *
+     * @param pictureEditByBatchRequest 图片批量编辑参数
+     * @param loginUser                 登录用户
+     */
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 }
