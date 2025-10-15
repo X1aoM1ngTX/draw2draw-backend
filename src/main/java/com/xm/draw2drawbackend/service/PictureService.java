@@ -3,6 +3,8 @@ package com.xm.draw2drawbackend.service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.xm.draw2drawbackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
+import com.xm.draw2drawbackend.model.dto.picture.CreatePictureOutPaintingTaskRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureEditByBatchRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureEditRequest;
 import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
@@ -143,4 +145,13 @@ public interface PictureService extends IService<Picture> {
      * @param loginUser                 登录用户
      */
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    /**
+     * 创建图片扩图任务
+     *
+     * @param createPictureOutPaintingTaskRequest 创建图片扩图任务请求
+     * @param loginUser                           登录用户
+     * @return                                    任务 ID
+     */
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }
