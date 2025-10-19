@@ -1,0 +1,130 @@
+package com.xm.draw2drawbackend.controller;
+
+import com.xm.draw2drawbackend.common.BaseResponse;
+import com.xm.draw2drawbackend.common.ResultUtils;
+import com.xm.draw2drawbackend.exception.ErrorCode;
+import com.xm.draw2drawbackend.exception.ThrowUtils;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceRankAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceSizeAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceTagAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUserAnalyzeRequest;
+import com.xm.draw2drawbackend.model.entity.Space;
+import com.xm.draw2drawbackend.model.entity.User;
+import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUserAnalyzeResponse;
+import com.xm.draw2drawbackend.service.SpaceAnalyzeService;
+import com.xm.draw2drawbackend.service.SpaceService;
+import com.xm.draw2drawbackend.service.UserService;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * 空间控制器
+ *
+ * @author X1aoM1ngTX
+ */
+@RestController
+@Slf4j
+@RequestMapping("/space/analyze")
+public class SpaceAnalyzeController {
+
+    @Resource
+    private UserService userService;
+
+    @Resource
+    private SpaceService spaceService;
+
+    @Resource
+    private SpaceAnalyzeService spaceAnalyzeService;
+
+    /**
+     * 获取空间使用状态
+     */
+    @PostMapping("/usage")
+    public BaseResponse<SpaceUsageAnalyzeResponse> getSpaceUsageAnalyze(
+            @RequestBody SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceUsageAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        SpaceUsageAnalyzeResponse spaceUsageAnalyze = spaceAnalyzeService.getSpaceUsageAnalyze(spaceUsageAnalyzeRequest,
+                loginUser);
+        return ResultUtils.success(spaceUsageAnalyze);
+    }
+
+    /**
+     * 获取空间分类使用状态
+     */
+    @PostMapping("/category")
+    public BaseResponse<List<SpaceCategoryAnalyzeResponse>> getSpaceCategoryAnalyze(
+            @RequestBody SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceCategoryAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceCategoryAnalyzeResponse> resultList = spaceAnalyzeService
+                .getSpaceCategoryAnalyze(spaceCategoryAnalyzeRequest, loginUser);
+        return ResultUtils.success(resultList);
+    }
+
+    /**
+     * 获取空间标签使用状态
+     */
+    @PostMapping("/tag")
+    public BaseResponse<List<SpaceTagAnalyzeResponse>> getSpaceTagAnalyze(
+            @RequestBody SpaceTagAnalyzeRequest spaceTagAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceTagAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceTagAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceTagAnalyze(spaceTagAnalyzeRequest,
+                loginUser);
+        return ResultUtils.success(resultList);
+
+    }
+
+    /**
+     * 获取空间大小使用状态
+     */
+    @PostMapping("/size")
+    public BaseResponse<List<SpaceSizeAnalyzeResponse>> getSpaceSizeAnalyze(
+            @RequestBody SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceSizeAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceSizeAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceSizeAnalyze(spaceSizeAnalyzeRequest,
+                loginUser);
+        return ResultUtils.success(resultList);
+    }
+
+    /**
+     * 获取空间用户使用状态
+     */
+    @PostMapping("/user")
+    public BaseResponse<List<SpaceUserAnalyzeResponse>> getSpaceUserAnalyze(
+            @RequestBody SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceUserAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        List<SpaceUserAnalyzeResponse> resultList = spaceAnalyzeService.getSpaceUserAnalyze(spaceUserAnalyzeRequest,
+                loginUser);
+        return ResultUtils.success(resultList);
+    }
+
+    /**
+     * 获取空间排行数据
+     */
+    @PostMapping("/rank")
+    public BaseResponse<List<Space>> getSpaceRankAnalyze(@RequestBody SpaceRankAnalyzeRequest spaceRankAnalyzeRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        User loginUser = userService.getLoginUser(request);
+        List<Space> resultList = spaceAnalyzeService.getSpaceRankAnalyze(spaceRankAnalyzeRequest, loginUser);
+        return ResultUtils.success(resultList);
+    }
+
+}
