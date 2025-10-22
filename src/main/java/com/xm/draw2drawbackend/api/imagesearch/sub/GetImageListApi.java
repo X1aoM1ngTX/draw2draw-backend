@@ -5,11 +5,9 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-
 import com.xm.draw2drawbackend.api.imagesearch.model.ImageSearchResult;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
-
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;

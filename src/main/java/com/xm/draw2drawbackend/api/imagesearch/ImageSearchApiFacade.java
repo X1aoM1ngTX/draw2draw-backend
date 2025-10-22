@@ -1,13 +1,12 @@
 package com.xm.draw2drawbackend.api.imagesearch;
 
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-
 import com.xm.draw2drawbackend.api.imagesearch.model.ImageSearchResult;
 import com.xm.draw2drawbackend.api.imagesearch.sub.GetImageFirstUrlApi;
 import com.xm.draw2drawbackend.api.imagesearch.sub.GetImageListApi;
 import com.xm.draw2drawbackend.api.imagesearch.sub.GetImagePageUrlApi;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 @Slf4j
 public class ImageSearchApiFacade {
@@ -19,6 +18,7 @@ public class ImageSearchApiFacade {
 
     /**
      * 搜索图片
+     *
      * @param imageUrl
      * @return
      */

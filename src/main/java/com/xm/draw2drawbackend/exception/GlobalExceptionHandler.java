@@ -2,6 +2,9 @@ package com.xm.draw2drawbackend.exception;
 
 import com.xm.draw2drawbackend.common.BaseResponse;
 import com.xm.draw2drawbackend.common.ResultUtils;
+
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,4 +45,29 @@ public class GlobalExceptionHandler {
         log.error("runtimeException", e);
         return ResultUtils.error(ErrorCode.SYSTEM_ERROR, e.getMessage(), "");
     }
+
+    /**
+     * 处理Sa-Token未登录异常
+     *
+     * @param e 未登录异常
+     * @return 响应
+     */
+    @ExceptionHandler(NotLoginException.class)
+    public BaseResponse<?> notLoginException(NotLoginException e) {
+        log.error("NotLoginException", e);
+        return ResultUtils.error(ErrorCode.NOT_LOGIN, e.getMessage(), "");
+    }
+
+    /**
+     * 处理Sa-Token无权限异常
+     *
+     * @param e 无权限异常
+     * @return 响应
+     */
+    @ExceptionHandler(NotPermissionException.class)
+    public BaseResponse<?> notPermissionExceptionHandler(NotPermissionException e) {
+        log.error("NotPermissionException", e);
+        return ResultUtils.error(ErrorCode.NO_AUTH, e.getMessage(), "");
+    }
+
 }

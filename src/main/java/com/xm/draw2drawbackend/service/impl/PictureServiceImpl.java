@@ -4,11 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import lombok.extern.slf4j.Slf4j;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,13 +20,7 @@ import com.xm.draw2drawbackend.manager.upload.PictureUploadTemplate;
 import com.xm.draw2drawbackend.manager.upload.UrlPictureUpload;
 import com.xm.draw2drawbackend.mapper.PictureMapper;
 import com.xm.draw2drawbackend.model.dto.file.UploadPictureResult;
-import com.xm.draw2drawbackend.model.dto.picture.CreatePictureOutPaintingTaskRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureEditByBatchRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureEditRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureUploadRequest;
+import com.xm.draw2drawbackend.model.dto.picture.*;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
@@ -42,28 +31,24 @@ import com.xm.draw2drawbackend.service.PictureService;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.ColorSimilarUtils;
-
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -611,8 +596,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         // 判断是否存在
         Picture oldPicture = this.getById(pictureId);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR, "图片不存在");
-        // 校验权限
-        checkPictureAuth(loginUser, oldPicture);
+        // 校验权限(已经改为注解鉴权)
+        // checkPictureAuth(loginUser, oldPicture);
         // 开启事务
         transactionTemplate.execute(status -> {
             // 操作数据库
@@ -655,8 +640,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         long id = pictureEditRequest.getId();
         Picture oldPicture = this.getById(id);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
-        // 权限校验
-        this.checkPictureAuth(loginUser, oldPicture);
+        // 权限校验(已经改为注解鉴权)
+        // checkPictureAuth(loginUser, oldPicture);
         // 填充审核参数
         this.fillReviewParams(picture, loginUser);
         // 操作数据库
@@ -784,7 +769,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     /**
      * 填充图片列表的名称规则
      * nameRule 图片_{序号} 例如：图片_1
-     * 
+     *
      * @param pictureList 图片列表
      * @param nameRule    命名规则
      */
@@ -804,6 +789,14 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         }
     }
 
+    /**
+     * 创建图片扩图任务
+     *
+     * @param createPictureOutPaintingTaskRequest 创建图片扩图任务参数
+     * @param loginUser                           登录用户
+     * @return 创建结果
+     */
+
     @Override
     public CreateOutPaintingTaskResponse createPictureOutPaintingTask(
             CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser) {
@@ -811,8 +804,8 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         Long pictureId = createPictureOutPaintingTaskRequest.getPictureId();
         Picture picture = Optional.ofNullable(this.getById(pictureId))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_ERROR, "图片不存在"));
-        // 校验权限
-        checkPictureAuth(loginUser, picture);
+        // 校验权限(已经改为注解鉴权)
+        // checkPictureAuth(loginUser, picture);
         // 创建扩图任务
         CreateOutPaintingTaskRequest createOutPaintingTaskRequest = new CreateOutPaintingTaskRequest();
         CreateOutPaintingTaskRequest.Input input = new CreateOutPaintingTaskRequest.Input();

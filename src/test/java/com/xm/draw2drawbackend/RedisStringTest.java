@@ -64,21 +64,21 @@ public class RedisStringTest {
         String batchKey2 = "test:string:batch2";
         String batchValue1 = "Batch Value 1";
         String batchValue2 = "Batch Value 2";
-        
+
         // 批量设置
         stringRedisTemplate.opsForValue().set(batchKey1, batchValue1);
         stringRedisTemplate.opsForValue().set(batchKey2, batchValue2);
-        
+
         // 批量获取
         String retrievedBatchValue1 = stringRedisTemplate.opsForValue().get(batchKey1);
         String retrievedBatchValue2 = stringRedisTemplate.opsForValue().get(batchKey2);
-        
+
         System.out.println("批量设置值1: " + batchValue1);
         System.out.println("批量获取值1: " + retrievedBatchValue1);
         System.out.println("批量设置值2: " + batchValue2);
         System.out.println("批量获取值2: " + retrievedBatchValue2);
-        System.out.println("批量操作测试结果: " + 
-            (batchValue1.equals(retrievedBatchValue1) && batchValue2.equals(retrievedBatchValue2)));
+        System.out.println("批量操作测试结果: " +
+                (batchValue1.equals(retrievedBatchValue1) && batchValue2.equals(retrievedBatchValue2)));
         System.out.println();
 
         // 6. 测试追加操作
@@ -86,11 +86,11 @@ public class RedisStringTest {
         String appendKey = "test:string:append";
         String originalValue = "Original";
         String appendValue = " Appended";
-        
+
         stringRedisTemplate.opsForValue().set(appendKey, originalValue);
         Integer appendResult = stringRedisTemplate.opsForValue().append(appendKey, appendValue);
         String finalValue = stringRedisTemplate.opsForValue().get(appendKey);
-        
+
         System.out.println("原值: " + originalValue);
         System.out.println("追加值: " + appendValue);
         System.out.println("追加后长度: " + appendResult);
@@ -103,7 +103,7 @@ public class RedisStringTest {
         stringRedisTemplate.delete(batchKey1);
         stringRedisTemplate.delete(batchKey2);
         stringRedisTemplate.delete(appendKey);
-        
+
         System.out.println("=== 测试完成，已清理测试数据 ===");
     }
 
@@ -111,19 +111,19 @@ public class RedisStringTest {
     public void testSetWithExpire() {
         String key = "test:set:expire";
         String value = "This value will expire in 5 seconds";
-        
+
         // 设置值并指定过期时间
         stringRedisTemplate.opsForValue().set(key, value, 5, TimeUnit.SECONDS);
-        
+
         // 获取值
         String retrievedValue = stringRedisTemplate.opsForValue().get(key);
         Long expireTime = stringRedisTemplate.getExpire(key);
-        
+
         System.out.println("设置带过期时间的键值对");
         System.out.println("键: " + key);
         System.out.println("值: " + retrievedValue);
         System.out.println("过期时间(秒): " + expireTime);
-        
+
         // 清理测试数据
         stringRedisTemplate.delete(key);
     }
@@ -133,22 +133,22 @@ public class RedisStringTest {
         String key = "test:set:if:absent";
         String value1 = "First Value";
         String value2 = "Second Value";
-        
+
         // 第一次设置，键不存在，应该设置成功
         Boolean result1 = stringRedisTemplate.opsForValue().setIfAbsent(key, value1);
         String retrievedValue1 = stringRedisTemplate.opsForValue().get(key);
-        
+
         // 第二次设置，键已存在，应该设置失败
         Boolean result2 = stringRedisTemplate.opsForValue().setIfAbsent(key, value2);
         String retrievedValue2 = stringRedisTemplate.opsForValue().get(key);
-        
+
         System.out.println("测试setIfAbsent操作");
         System.out.println("第一次设置结果: " + result1);
         System.out.println("第一次设置后获取的值: " + retrievedValue1);
         System.out.println("第二次设置结果: " + result2);
         System.out.println("第二次设置后获取的值: " + retrievedValue2);
         System.out.println("测试结果: " + (result1 && !result2 && value1.equals(retrievedValue2)));
-        
+
         // 清理测试数据
         stringRedisTemplate.delete(key);
     }

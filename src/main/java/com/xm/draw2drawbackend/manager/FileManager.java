@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
-
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
 import com.xm.draw2drawbackend.config.CosClientConfig;
@@ -22,10 +21,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-/**  
- * 文件服务  
- * @deprecated 已废弃，改为使用 upload 包的模板方法优化  
- */  
+/**
+ * 文件服务
+ *
+ * @deprecated 已废弃，改为使用 upload 包的模板方法优化
+ */
 @Deprecated
 @Slf4j
 @Service

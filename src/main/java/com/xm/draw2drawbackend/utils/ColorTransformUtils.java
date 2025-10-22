@@ -15,14 +15,14 @@ public class ColorTransformUtils {
         System.out.println("0xfff -> " + getStandardColor("0xfff"));
         System.out.println("0x000 -> " + getStandardColor("0x000"));
         System.out.println("0xabc -> " + getStandardColor("0xabc"));
-        
+
         // 测试4位HEX
         System.out.println("\n4位HEX测试:");
         System.out.println("0x0a00 -> " + getStandardColor("0x0a00"));
         System.out.println("0xa100 -> " + getStandardColor("0xa100"));
         System.out.println("0x0c00 -> " + getStandardColor("0x0c00"));
         System.out.println("0x1234 -> " + getStandardColor("0x1234"));
-        
+
         // 测试5位HEX
         System.out.println("\n5位HEX测试:");
         System.out.println("0x020e0 -> " + getStandardColor("0x020e0"));
@@ -30,7 +30,7 @@ public class ColorTransformUtils {
         System.out.println("0x0ab00 -> " + getStandardColor("0x0ab00"));
         System.out.println("0x00ab0 -> " + getStandardColor("0x00ab0"));
         System.out.println("0xa0b40 -> " + getStandardColor("0xa0b40"));
-        
+
         // 测试6位HEX
         System.out.println("\n6位HEX测试:");
         System.out.println("0x020e00 -> " + getStandardColor("0x020e00"));

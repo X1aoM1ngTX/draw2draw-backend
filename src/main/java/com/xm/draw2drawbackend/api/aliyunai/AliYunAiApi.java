@@ -10,7 +10,6 @@ import com.xm.draw2drawbackend.api.aliyunai.model.GetOutPaintingTaskResponse;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,15 +18,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AliYunAiApi {
 
+    // 创建任务地址
+    public static final String CREATE_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/out-painting";
+    // 查询任务状态
+    public static final String GET_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/%s";
     // 读取配置文件
     @Value("${aliYunAi.apiKey}")
     private String apiKey;
-
-    // 创建任务地址
-    public static final String CREATE_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/services/aigc/image2image/out-painting";
-
-    // 查询任务状态
-    public static final String GET_OUT_PAINTING_TASK_URL = "https://dashscope.aliyuncs.com/api/v1/tasks/%s";
 
     /**
      * 创建任务

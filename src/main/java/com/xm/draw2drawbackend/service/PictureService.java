@@ -4,20 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xm.draw2drawbackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
-import com.xm.draw2drawbackend.model.dto.picture.CreatePictureOutPaintingTaskRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureEditByBatchRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureEditRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureQueryRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureReviewRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.xm.draw2drawbackend.model.dto.picture.PictureUploadRequest;
+import com.xm.draw2drawbackend.model.dto.picture.*;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.PictureVO;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author X1aoM1ngTX
@@ -41,8 +34,8 @@ public interface PictureService extends IService<Picture> {
      * @return
      */
     PictureVO uploadPicture(Object inputSource,
-            PictureUploadRequest pictureUploadRequest,
-            User loginUser);
+                            PictureUploadRequest pictureUploadRequest,
+                            User loginUser);
 
     /**
      * 批量抓取和创建图片
@@ -151,7 +144,7 @@ public interface PictureService extends IService<Picture> {
      *
      * @param createPictureOutPaintingTaskRequest 创建图片扩图任务请求
      * @param loginUser                           登录用户
-     * @return                                    任务 ID
+     * @return 任务 ID
      */
     CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }

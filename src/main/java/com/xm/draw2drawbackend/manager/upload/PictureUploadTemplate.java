@@ -1,11 +1,10 @@
 package com.xm.draw2drawbackend.manager.upload;
 
-import java.io.File;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.qcloud.cos.model.PutObjectResult;
 import com.qcloud.cos.model.ciModel.persistence.CIObject;
 import com.qcloud.cos.model.ciModel.persistence.ImageInfo;
@@ -15,13 +14,12 @@ import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.manager.CosManager;
 import com.xm.draw2drawbackend.model.dto.file.UploadPictureResult;
-
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.RandomUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
 
 /**
  * 图片上传模板类，使用模板方法模式定义上传流程
@@ -105,7 +103,7 @@ public abstract class PictureUploadTemplate {
 
     /**
      * 封装返回结果
-     * 
+     *
      * @param originFilename 原始文件名
      * @param file           上传的文件
      * @param uploadPath     上传路径
@@ -130,14 +128,14 @@ public abstract class PictureUploadTemplate {
 
     /**
      * 封装返回结果
-     * 
+     *
      * @param originFilename     原始文件名
      * @param compressedCiObject 压缩之后的图片对象
      * @param thumbnailCiObject  缩略图对象
      * @return 上传结果
      */
     private UploadPictureResult buildResult(String originFilename, CIObject compressedCiObject,
-            CIObject thumbnailCiObject, ImageInfo imageInfo) {
+                                            CIObject thumbnailCiObject, ImageInfo imageInfo) {
         // 获取图片的宽高和比例
         int picWidth = compressedCiObject.getWidth();
         int picHeight = compressedCiObject.getHeight();

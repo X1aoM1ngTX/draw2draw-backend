@@ -4,30 +4,22 @@ import com.xm.draw2drawbackend.common.BaseResponse;
 import com.xm.draw2drawbackend.common.ResultUtils;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceRankAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceSizeAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceTagAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUserAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.*;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUserAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.*;
 import com.xm.draw2drawbackend.service.SpaceAnalyzeService;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
-
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 空间控制器
@@ -120,7 +112,7 @@ public class SpaceAnalyzeController {
      */
     @PostMapping("/rank")
     public BaseResponse<List<Space>> getSpaceRankAnalyze(@RequestBody SpaceRankAnalyzeRequest spaceRankAnalyzeRequest,
-            HttpServletRequest request) {
+                                                         HttpServletRequest request) {
         ThrowUtils.throwIf(spaceRankAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
         User loginUser = userService.getLoginUser(request);
         List<Space> resultList = spaceAnalyzeService.getSpaceRankAnalyze(spaceRankAnalyzeRequest, loginUser);

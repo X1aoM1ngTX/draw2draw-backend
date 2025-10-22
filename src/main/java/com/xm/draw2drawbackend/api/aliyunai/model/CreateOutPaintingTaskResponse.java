@@ -13,6 +13,21 @@ import lombok.NoArgsConstructor;
 public class CreateOutPaintingTaskResponse {
 
     private Output output;
+    /**
+     * 接口错误码。
+     * <p>接口成功请求不会返回该参数。</p>
+     */
+    private String code;
+    /**
+     * 接口错误信息。
+     * <p>接口成功请求不会返回该参数。</p>
+     */
+    private String message;
+    /**
+     * 请求唯一标识。
+     * <p>可用于请求明细溯源和问题排查。</p>
+     */
+    private String requestId;
 
     /**
      * 表示任务的输出信息
@@ -38,23 +53,5 @@ public class CreateOutPaintingTaskResponse {
          */
         private String taskStatus;
     }
-
-    /**
-     * 接口错误码。
-     * <p>接口成功请求不会返回该参数。</p>
-     */
-    private String code;
-
-    /**
-     * 接口错误信息。
-     * <p>接口成功请求不会返回该参数。</p>
-     */
-    private String message;
-
-    /**
-     * 请求唯一标识。
-     * <p>可用于请求明细溯源和问题排查。</p>
-     */
-    private String requestId;
 
 }

@@ -1,16 +1,14 @@
 package com.xm.draw2drawbackend.manager.upload;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
+import cn.hutool.core.io.FileUtil;
+import com.xm.draw2drawbackend.exception.ErrorCode;
+import com.xm.draw2drawbackend.exception.ThrowUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.xm.draw2drawbackend.exception.ErrorCode;
-import com.xm.draw2drawbackend.exception.ThrowUtils;
-
-import cn.hutool.core.io.FileUtil;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 文件图片上传实现类

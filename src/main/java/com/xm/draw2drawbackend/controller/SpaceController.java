@@ -9,30 +9,25 @@ import com.xm.draw2drawbackend.constant.UserConstant;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.model.dto.space.SpaceAddRequest;
-import com.xm.draw2drawbackend.model.dto.space.SpaceEditRequest;
-import com.xm.draw2drawbackend.model.dto.space.SpaceLevel;
-import com.xm.draw2drawbackend.model.dto.space.SpaceQueryRequest;
-import com.xm.draw2drawbackend.model.dto.space.SpaceUpdateRequest;
+import com.xm.draw2drawbackend.manager.SpacePictureManager;
+import com.xm.draw2drawbackend.manager.auth.SpaceUserAuthManager;
+import com.xm.draw2drawbackend.model.dto.space.*;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
-import com.xm.draw2drawbackend.manager.SpacePictureManager;
 import com.xm.draw2drawbackend.model.enums.SpaceLevelEnum;
 import com.xm.draw2drawbackend.model.vo.SpaceVO;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 空间控制器
@@ -53,8 +48,8 @@ public class SpaceController {
     @Resource
     private SpacePictureManager spacePictureManager;
 
-    // @Resource
-    // private SpaceUserAuthManager spaceUserAuthManager;
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
 
     /**
      * 创建空间
@@ -140,11 +135,11 @@ public class SpaceController {
         // 查询数据库
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-        // SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
-        // User loginUser = userService.getLoginUser(request);
-        // List<String> permissionList = spaceUserAuthManager.getPermissionList(space,
-        // loginUser);
-        // spaceVO.setPermissionList(permissionList);
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space,
+                loginUser);
+        spaceVO.setPermissionList(permissionList);  
         // 获取封装类
         return ResultUtils.success(spaceService.getSpaceVO(space, request));
     }

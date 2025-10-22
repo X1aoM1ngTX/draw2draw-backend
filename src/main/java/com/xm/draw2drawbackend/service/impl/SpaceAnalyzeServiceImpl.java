@@ -1,47 +1,34 @@
 package com.xm.draw2drawbackend.service.impl;
 
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
 import com.xm.draw2drawbackend.mapper.SpaceMapper;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceCategoryAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceRankAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceSizeAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceTagAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUsageAnalyzeRequest;
-import com.xm.draw2drawbackend.model.dto.space.analyze.SpaceUserAnalyzeRequest;
+import com.xm.draw2drawbackend.model.dto.space.analyze.*;
 import com.xm.draw2drawbackend.model.entity.Picture;
 import com.xm.draw2drawbackend.model.entity.Space;
 import com.xm.draw2drawbackend.model.entity.User;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceCategoryAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceSizeAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceTagAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUsageAnalyzeResponse;
-import com.xm.draw2drawbackend.model.vo.space.analyze.SpaceUserAnalyzeResponse;
+import com.xm.draw2drawbackend.model.vo.space.analyze.*;
 import com.xm.draw2drawbackend.service.PictureService;
 import com.xm.draw2drawbackend.service.SpaceAnalyzeService;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
+import org.springframework.stereotype.Service;
 
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ObjUtil;
-import cn.hutool.json.JSONUtil;
-
+import javax.annotation.Resource;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 /**
  * 空间分析服务实现类
- * 
+ *
  * @author XMTX8yyds
  */
 @Service
@@ -58,8 +45,31 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
     private PictureService pictureService;
 
     /**
+     * 填充空间分析查询条件
+     *
+     * @param spaceAnalyzeRequest 空间分析请求
+     * @param queryWrapper        查询包装器
+     */
+    private static void fillAnalyzeQueryWrapper(SpaceAnalyzeRequest spaceAnalyzeRequest,
+                                                QueryWrapper<Picture> queryWrapper) {
+        if (spaceAnalyzeRequest.isQueryAll()) {
+            return;
+        }
+        if (spaceAnalyzeRequest.isQueryPublic()) {
+            queryWrapper.isNull("spaceId");
+            return;
+        }
+        Long spaceId = spaceAnalyzeRequest.getSpaceId();
+        if (spaceId != null) {
+            queryWrapper.eq("spaceId", spaceId);
+            return;
+        }
+        throw new BusinessException(ErrorCode.PARAMS_ERROR, "未指定查询范围");
+    }
+
+    /**
      * 检查空间分析权限
-     * 
+     *
      * @param spaceAnalyzeRequest 空间分析请求
      * @param loginUser           登录用户
      */
@@ -79,29 +89,6 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
     }
 
     /**
-     * 填充空间分析查询条件
-     * 
-     * @param spaceAnalyzeRequest 空间分析请求
-     * @param queryWrapper        查询包装器
-     */
-    private static void fillAnalyzeQueryWrapper(SpaceAnalyzeRequest spaceAnalyzeRequest,
-            QueryWrapper<Picture> queryWrapper) {
-        if (spaceAnalyzeRequest.isQueryAll()) {
-            return;
-        }
-        if (spaceAnalyzeRequest.isQueryPublic()) {
-            queryWrapper.isNull("spaceId");
-            return;
-        }
-        Long spaceId = spaceAnalyzeRequest.getSpaceId();
-        if (spaceId != null) {
-            queryWrapper.eq("spaceId", spaceId);
-            return;
-        }
-        throw new BusinessException(ErrorCode.PARAMS_ERROR, "未指定查询范围");
-    }
-
-    /**
      * 获取空间使用分析数据
      *
      * @param spaceUsageAnalyzeRequest SpaceUsageAnalyzeRequest 请求参数
@@ -111,7 +98,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
     @Override
     public SpaceUsageAnalyzeResponse getSpaceUsageAnalyze(SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest,
-            User loginUser) {
+                                                          User loginUser) {
         ThrowUtils.throwIf(spaceUsageAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
         if (spaceUsageAnalyzeRequest.isQueryAll() || spaceUsageAnalyzeRequest.isQueryPublic()) {
             // 查询全部或公共图库逻辑
@@ -188,8 +175,8 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
 
         // 使用 MyBatis-Plus 分组查询
         queryWrapper.select("category AS category",
-                "COUNT(*) AS count",
-                "SUM(picSize) AS totalSize")
+                        "COUNT(*) AS count",
+                        "SUM(picSize) AS totalSize")
                 .groupBy("category");
 
         // 查询并转换结果
@@ -213,7 +200,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
      */
     @Override
     public List<SpaceTagAnalyzeResponse> getSpaceTagAnalyze(SpaceTagAnalyzeRequest spaceTagAnalyzeRequest,
-            User loginUser) {
+                                                            User loginUser) {
         // 校验参数
         ThrowUtils.throwIf(spaceTagAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
         // 检查权限
@@ -252,7 +239,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
      */
     @Override
     public List<SpaceSizeAnalyzeResponse> getSpaceSizeAnalyze(SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest,
-            User loginUser) {
+                                                              User loginUser) {
         // 校验参数
         ThrowUtils.throwIf(spaceSizeAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
         // 检查权限
@@ -290,7 +277,7 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
      */
     @Override
     public List<SpaceUserAnalyzeResponse> getSpaceUserAnalyze(SpaceUserAnalyzeRequest spaceUserAnalyzeRequest,
-            User loginUser) {
+                                                              User loginUser) {
         // 校验参数
         ThrowUtils.throwIf(spaceUserAnalyzeRequest == null, ErrorCode.PARAMS_ERROR, "请求参数为空");
         // 检查权限
@@ -304,16 +291,16 @@ public class SpaceAnalyzeServiceImpl extends ServiceImpl<SpaceMapper, Space>
         String timeDimension = spaceUserAnalyzeRequest.getTimeDimension();
         switch (timeDimension) {
             case "day":
-                queryWrapper.groupBy("date_format(createTime, '%Y-%m-%d') AS period", "count(*) AS count");
+                queryWrapper.select("DATE_FORMAT(createTime, '%Y-%m-%d') AS period", "COUNT(*) AS count");
                 break;
             case "week":
-                queryWrapper.groupBy("date_format(createTime, '%Y-%u') AS period", "count(*) AS count");
+                queryWrapper.select("YEARWEEK(createTime) AS period", "COUNT(*) AS count");
                 break;
             case "month":
-                queryWrapper.groupBy("date_format(createTime, '%Y-%m') AS period", "count(*) AS count");
+                queryWrapper.select("DATE_FORMAT(createTime, '%Y-%m') AS period", "COUNT(*) AS count");
                 break;
             default:
-                throw new BusinessException(ErrorCode.PARAMS_ERROR, "无效的时间维度: " + timeDimension);
+                throw new BusinessException(ErrorCode.PARAMS_ERROR, "不支持的时间维度");
         }
 
         // 查询所有符合条件的用户ID

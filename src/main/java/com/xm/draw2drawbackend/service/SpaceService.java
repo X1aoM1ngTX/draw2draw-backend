@@ -1,5 +1,8 @@
 package com.xm.draw2drawbackend.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.xm.draw2drawbackend.model.dto.space.SpaceAddRequest;
 import com.xm.draw2drawbackend.model.dto.space.SpaceQueryRequest;
 import com.xm.draw2drawbackend.model.entity.Space;
@@ -7,10 +10,6 @@ import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.SpaceVO;
 
 import javax.servlet.http.HttpServletRequest;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * @author XMTX8yyds

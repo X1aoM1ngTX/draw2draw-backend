@@ -1,8 +1,8 @@
 package com.xm.draw2drawbackend.model.dto.picture;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
 
 /**
  * 以图搜图请求
@@ -10,10 +10,9 @@ import lombok.Data;
 @Data
 public class SearchPictureByPictureRequest implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     /**
      * 图片 id
      */
     private Long pictureId;
-
-    private static final long serialVersionUID = 1L;
 }

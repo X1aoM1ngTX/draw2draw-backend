@@ -1,15 +1,17 @@
 package com.xm.draw2drawbackend;
 
+import org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @author X1aoM1ngTX
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {ShardingSphereAutoConfiguration.class})
 @MapperScan("com.xm.draw2drawbackend.mapper")
 @EnableAsync
 @EnableAspectJAutoProxy(exposeProxy = true)

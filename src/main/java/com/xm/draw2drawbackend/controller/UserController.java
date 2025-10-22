@@ -177,27 +177,27 @@ public class UserController {
             HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
         ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH, "用户未登录");
-        
+
         // 上传头像，按照用户 id 划分目录
         String uploadPathPrefix = String.format("public/avatar/%s", loginUser.getId());
         UploadPictureResult uploadPictureResult = filePictureUpload.uploadPicture(multipartFile, uploadPathPrefix);
-        
+
         // 使用UploadPictureResult中的缩略图URL（如果存在）
         String finalAvatarUrl = uploadPictureResult.getThumbnailUrl();
         // 如果缩略图URL不存在，则使用原图URL
         if (finalAvatarUrl == null || finalAvatarUrl.isEmpty()) {
             finalAvatarUrl = uploadPictureResult.getUrl();
         }
-        
+
         // 更新用户头像
         User updateUser = new User();
         updateUser.setId(loginUser.getId());
         updateUser.setUserAvatar(finalAvatarUrl);
         boolean result = userService.updateById(updateUser);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "头像更新失败");
-        
+
         return ResultUtils.success(finalAvatarUrl);
     }
 
-    
+
 }
