@@ -163,7 +163,11 @@ public class PictureController {
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
         // 补充审核参数
         User loginUser = userService.getLoginUser(request);
-        pictureService.fillReviewParams(oldPicture, loginUser);
+        // 设置spaceId到picture对象，以便fillReviewParams使用
+        Long spaceId = oldPicture.getSpaceId();
+        picture.setSpaceId(spaceId);
+        log.info("设置picture对象的spaceId: {}, pictureId: {}", spaceId, picture.getId());
+        pictureService.fillReviewParams(picture, loginUser);
         // 操作数据库
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
