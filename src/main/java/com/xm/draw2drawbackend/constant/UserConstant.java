@@ -16,6 +16,11 @@ public interface UserConstant {
     String ADMIN_ROLE = "admin";
 
     /**
+     * 会员权限
+     */
+    String VIP_ROLE = "vip";
+
+    /**
      * 普通用户权限
      */
     String USER_ROLE = "user";

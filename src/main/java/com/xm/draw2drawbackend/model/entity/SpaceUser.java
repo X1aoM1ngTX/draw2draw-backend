@@ -15,6 +15,7 @@ import lombok.Data;
 @TableName(value ="space_user")
 @Data
 public class SpaceUser implements Serializable {
+    
     /**
      * id
      */

@@ -57,4 +57,24 @@ public class LoginUserVO implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 是否为VIP会员
+     */
+    private Integer isVip;
+
+    /**
+     * 会员过期时间
+     */
+    private Date vipExpireTime;
+
+    /**
+     * 会员兑换码
+     */
+    private String vipCode;
+
+    /**
+     * 会员编号
+     */
+    private Long vipNumber;
 }

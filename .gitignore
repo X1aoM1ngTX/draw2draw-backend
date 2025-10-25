@@ -36,3 +36,4 @@ build/
 application-dev.yml
 application-prod.yml
 *.txt
+VipCode.json

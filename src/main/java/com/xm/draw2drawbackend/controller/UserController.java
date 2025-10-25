@@ -56,7 +56,8 @@ public class UserController {
      * 用户登录
      */
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
+    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest,
+            HttpServletRequest request) {
         ThrowUtils.throwIf(userLoginRequest == null, ErrorCode.PARAMS_ERROR);
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
@@ -131,7 +132,8 @@ public class UserController {
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest) {
-        ThrowUtils.throwIf(userDeleteRequest == null || userDeleteRequest.getUserId() == null || userDeleteRequest.getUserId().isEmpty(), ErrorCode.PARAMS_ERROR, "参数错误");
+        ThrowUtils.throwIf(userDeleteRequest == null || userDeleteRequest.getUserId() == null
+                || userDeleteRequest.getUserId().isEmpty(), ErrorCode.PARAMS_ERROR, "参数错误");
         long userId = Long.parseLong(userDeleteRequest.getUserId());
         boolean result = userService.removeById(userId);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "删除失败");
@@ -144,11 +146,37 @@ public class UserController {
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
-        ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ErrorCode.PARAMS_ERROR, "参数错误");
+        ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ErrorCode.PARAMS_ERROR,
+                "参数错误");
         User user = new User();
         BeanUtil.copyProperties(userUpdateRequest, user);
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "更新失败");
+        return ResultUtils.success(true);
+    }
+
+    /**
+     * 用户更新自己的信息
+     */
+    @PostMapping("/update/my")
+    public BaseResponse<Boolean> updateMyInfo(@RequestBody UserMyInfoUpdateRequest userMyInfoUpdateRequest,
+                                             HttpServletRequest request) {
+        ThrowUtils.throwIf(userMyInfoUpdateRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
+
+        // 获取当前登录用户
+        User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(loginUser == null, ErrorCode.NO_AUTH, "用户未登录");
+
+        // 创建更新对象，只能修改自己的信息
+        User user = new User();
+        user.setId(loginUser.getId()); // 设置为当前登录用户的ID
+        user.setUserName(userMyInfoUpdateRequest.getUserName());
+        user.setUserProfile(userMyInfoUpdateRequest.getUserProfile());
+        // 注意：用户头像通过单独的上传头像接口修改，这里不包含
+
+        boolean result = userService.updateById(user);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR, "更新失败");
+
         return ResultUtils.success(true);
     }
 
@@ -161,7 +189,8 @@ public class UserController {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = userQueryRequest.getCurrent();
         long pageSize = userQueryRequest.getPageSize();
-        Page<User> userPage = userService.page(new Page<>(current, pageSize), userService.getQueryWrapper(userQueryRequest));
+        Page<User> userPage = userService.page(new Page<>(current, pageSize),
+                userService.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, pageSize, userPage.getTotal());
         List<UserVO> userVOList = userService.getUserVOList(userPage.getRecords());
         userVOPage.setRecords(userVOList);
@@ -199,5 +228,18 @@ public class UserController {
         return ResultUtils.success(finalAvatarUrl);
     }
 
+    /**
+     * 兑换会员
+     */
+    @PostMapping("/exchange/vip")
+    public BaseResponse<Boolean> exchangeVip(@RequestBody VipExchangeRequest vipExchangeRequest,
+            HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(vipExchangeRequest == null, ErrorCode.PARAMS_ERROR);
+        String vipCode = vipExchangeRequest.getVipCode();
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        // 调用 service 层的方法进行会员兑换
+        boolean result = userService.exchangeVipByCode(loginUser, vipCode);
+        return ResultUtils.success(result);
+    }
 
 }

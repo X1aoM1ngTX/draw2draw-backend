@@ -81,7 +81,6 @@ public interface UserService extends IService<User> {
      */
     QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
 
-
     /**
      * 是否为管理员
      *
@@ -89,4 +88,13 @@ public interface UserService extends IService<User> {
      * @return 是否为管理员
      */
     boolean isAdmin(User user);
+
+    /**
+     * 用户兑换会员
+     * 
+     * @param user    用户
+     * @param vipCode 会员码
+     * @return 是否成功
+     */
+    boolean exchangeVipByCode(User user, String vipCode);
 }

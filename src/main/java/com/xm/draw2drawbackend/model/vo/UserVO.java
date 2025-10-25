@@ -37,7 +37,7 @@ public class UserVO implements Serializable {
      * 用户简介
      */
     private String userProfile;
-    
+
     /**
      * 用户角色：user/admin
      */
@@ -47,4 +47,24 @@ public class UserVO implements Serializable {
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 是否为VIP会员
+     */
+    private Integer isVip;
+
+    /**
+     * 会员过期时间
+     */
+    private Date vipExpireTime;
+
+    /**
+     * 会员兑换码
+     */
+    private String vipCode;
+
+    /**
+     * 会员编号
+     */
+    private Long vipNumber;
 }

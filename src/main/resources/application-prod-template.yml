@@ -1,0 +1,37 @@
+server:
+  port: your_port_number
+spring:
+  # 数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://your_host:3306/your_database
+    username: your_database_username
+    password: your_database_password
+  # Redis 配置
+  redis:
+    database: your_database_index # default is 0
+    host: your_host
+    port: 6379
+    timeout: 5000
+    password: your_database_password
+mybatis-plus:
+  configuration:
+    # 生产环境关闭日志
+    log-impl: ""
+# 接口文档配置
+knife4j:
+  basic:
+    enable: true
+    username: root
+    password: your_password
+# 对象存储配置
+cos:
+  client:
+    host: xxx
+    secretId: xxx
+    secretKey: xxx
+    region: xxx
+    bucket: xxx
+# 阿里云 AI 配置
+aliYunAi:
+  apiKey: xxx

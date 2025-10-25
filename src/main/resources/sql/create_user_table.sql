@@ -12,16 +12,14 @@ create table if not exists user
     createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
     updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
     isDelete     tinyint      default 0                 not null comment '是否删除',
-    -- 会员功能字段
-    -- vipExpireTime datetime null comment '会员过期时间',
-    -- vipCode varchar(128) null comment '会员兑换码',
-    -- vipNumber bigint null comment '会员编号',
-    -- 用户邀请功能字段
-    -- shareCode varchar(20) default null comment '分享码',
-    -- inviteUser bigint default null comment '邀请用户id',
+
     UNIQUE KEY uk_userAccount (userAccount),
-    -- UNIQUE KEY uk_shareCode (shareCode),
     INDEX idx_userName (userName)
-    -- INDEX idx_inviteUser (inviteUser),
-    -- INDEX idx_vipExpireTime (vipExpireTime)
 ) comment '用户' collate = utf8mb4_unicode_ci;
+
+-- 扩展用户表：新增会员功能
+ALTER TABLE user
+    ADD COLUMN isVip tinyint efault 0 COMMENT '是否为会员 0-非会员 1-会员';
+    ADD COLUMN vipExpireTime datetime NULL COMMENT '会员过期时间',
+    ADD COLUMN vipCode varchar(128) NULL COMMENT '会员兑换码',
+    ADD COLUMN vipNumber bigint NULL COMMENT '会员编号';
