@@ -4,13 +4,18 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qcloud.cos.model.ciModel.image.ImageLabelResponse;
 import com.xm.draw2drawbackend.api.aliyunai.AliYunAiApi;
 import com.xm.draw2drawbackend.api.aliyunai.model.CreateOutPaintingTaskRequest;
 import com.xm.draw2drawbackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
+import com.xm.draw2drawbackend.api.tencentci.TencentCiImageLabelApi;
+import com.xm.draw2drawbackend.api.tencentci.model.TencentImageLabelResult;
 import com.xm.draw2drawbackend.config.CosClientConfig;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
@@ -37,6 +42,7 @@ import com.xm.draw2drawbackend.service.SpaceUserService;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.ColorSimilarUtils;
 import com.xm.draw2drawbackend.utils.ColorTransformUtils;
+import com.xm.draw2drawbackend.utils.UrlParseUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -96,6 +102,9 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
 
     @Resource
     private AliYunAiApi aliyunAiApi;
+
+    @Resource
+    private TencentCiImageLabelApi tencentCiImageLabelApi;
 
     /**
      * 校验图片参数
@@ -234,6 +243,42 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             // 异步删除旧图片文件
             this.clearPictureFile(oldPicture);
         }
+        // 自动触发腾讯云COS图片标签识别功能 - 已移除，改为前端手动触发
+        // try {
+        //     // 从配置中获取bucket名称
+        //     String bucket = cosClientConfig.getBucket();
+        //     // 从图片URL中提取完整的对象键（包括目录路径）
+        //     String objectKey = UrlParseUtils.extractObjectKeyFromUrl(picture.getUrl());
+        //     log.info("上传图片自动标签识别，图片ID: {}, bucket: {}, objectKey: {}", picture.getId(), bucket, objectKey);
+        //     // 获取图片标签
+        //     List<com.xm.draw2drawbackend.api.tencentci.model.TencentImageLabelResult> labelResults =
+        //             this.getImageLabels(picture.getId(), bucket, objectKey);
+        //     // 将识别出的标签保存到图片中，与用户手动输入的标签合并
+        //     if (labelResults != null && !labelResults.isEmpty()) {
+        //         // 获取当前图片的标签
+        //         String currentTags = picture.getTags();
+        //         List<String> existingTags = new ArrayList<>();
+        //         if (StrUtil.isNotBlank(currentTags) && JSONUtil.isTypeJSONArray(currentTags)) {
+        //             existingTags = JSONUtil.toList(currentTags, String.class);
+        //         }
+        //         // 提取识别出的标签名称
+        //         List<String> autoTags = labelResults.stream()
+        //                 .map(TencentImageLabelResult::getLabel)
+        //                 .filter(label -> label != null && !label.trim().isEmpty())
+        //                 .collect(Collectors.toList());
+        //         // 合并标签（去重）
+        //         Set<String> allTagsSet = new HashSet<>(existingTags);
+        //         allTagsSet.addAll(autoTags);
+        //         List<String> allTags = new ArrayList<>(allTagsSet);
+        //         // 更新图片标签
+        //         picture.setTags(JSONUtil.toJsonStr(allTags));
+        //         // 保存更新
+        //         this.updateById(picture);
+        //     }
+        // } catch (Exception e) {
+        //     log.error("自动识别图片标签失败，图片ID: {}", picture.getId(), e);
+        //     // 这里可以选择继续处理，不抛出异常，因为标签识别失败不应影响图片上传
+        // }
         return PictureVO.objToVo(picture);
     }
 
@@ -343,7 +388,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             // and (name like "%xxx%" or introduction like "%xxx%")
             queryWrapper.and(
                     qw -> qw.like("name", searchText)
-                    .or()
+                            .or()
                             .like("introduction", searchText)
             );
         }
@@ -582,7 +627,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
                 break;
             }
         }
-
         log.info("批量上传完成，成功: {}, 失败: {}, 总计: {}", uploadCount, failCount, imgElementList.size());
         return uploadCount;
     }
@@ -597,9 +641,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     public void clearPictureFile(Picture oldPicture) {
         // 判断该图片是否被多条记录使用
         String pictureUrl = oldPicture.getUrl();
-        long count = this.lambdaQuery()
-                .eq(Picture::getUrl, pictureUrl)
-                .count();
+        long count = this.lambdaQuery().eq(Picture::getUrl, pictureUrl).count();
         // 有不止一条记录用到了该图片，不清理
         if (count > 1) {
             return;
@@ -644,7 +686,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
             // 更新空间的使用额度，释放额度（仅当图片属于某个空间时）
             if (oldPicture.getSpaceId() != null) {
                 boolean update = spaceService.lambdaUpdate()
-                    .eq(Space::getId, oldPicture.getSpaceId())
+                        .eq(Space::getId, oldPicture.getSpaceId())
                         .setSql("totalSize = totalSize - " + oldPicture.getPicSize())
                         .setSql("totalCount = totalCount - 1")
                         .update();
@@ -689,7 +731,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         log.info("图片编辑完成，ID: {}, 审核状态: {}, 审核信息: {}",
                 picture.getId(), picture.getReviewStatus(), picture.getReviewMessage());
     }
-    
+
     /**
      * 检查图片权限
      *
@@ -831,8 +873,7 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
     }
 
     /**
-     * 填充图片列表的名称规则
-     * nameRule 图片_{序号} 例如：图片_1
+     * 填充图片列表的名称规则 nameRule 图片_{序号} 例如：图片_1
      *
      * @param pictureList 图片列表
      * @param nameRule    命名规则
@@ -860,7 +901,6 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
      * @param loginUser                           登录用户
      * @return 创建结果
      */
-
     @Override
     public CreateOutPaintingTaskResponse createPictureOutPaintingTask(
             CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser) {
@@ -878,5 +918,100 @@ public class PictureServiceImpl extends ServiceImpl<PictureMapper, Picture> impl
         createOutPaintingTaskRequest.setParameters(createPictureOutPaintingTaskRequest.getParameters());
         // 创建任务
         return aliyunAiApi.createOutPaintingTask(createOutPaintingTaskRequest);
+    }
+
+    /**
+     * 获取图片标签识别结果 支持两种调用方式： 1. 通过pictureId自动解析图片URL获取bucket和key 2. 直接提供bucket和key参数
+     *
+     * @param pictureId 图片ID，可选，如果提供则自动解析bucket和key
+     * @param bucket 存储桶名称，可选，与pictureId二选一
+     * @param key 图片在存储桶中的位置，可选，与pictureId二选一
+     * @return 图片标签识别结果列表，包含标签名称、置信度、分类等信息
+     */
+    @Override
+    public List<TencentImageLabelResult> getImageLabels(Long pictureId, String bucket, String key) {
+        // 如果提供了图片ID，则从数据库获取图片信息
+        Picture picture = null;
+        if (pictureId != null) {
+            log.info("根据ID查找图片，pictureId: {}", pictureId);
+            picture = this.getById(pictureId);
+            if (picture == null) {
+                log.error("未找到图片，pictureId: {}", pictureId);
+                throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "图片不存在，ID: " + pictureId);
+            }
+            log.info("找到图片，URL: {}", picture.getUrl());
+            // 校验权限(已经改为注解鉴权)
+            // User loginUser = userService.getLoginUser(request);
+            // checkPictureAuth(loginUser, picture);
+            // 从图片URL中提取bucket和key信息
+            String pictureUrl = picture.getUrl();
+            log.info("原始图片URL: {}", pictureUrl);
+
+            // 从URL中解析bucket和key，这取决于您的COS URL格式
+            // 假设URL格式为: https://<bucket>-<appid>.cos.<region>.myqcloud.com/<key>
+            String bucketName = cosClientConfig.getBucket(); // 使用配置中的bucket
+
+            // 使用工具类解析对象键，处理包含路径的情况
+            String objectKey = UrlParseUtils.extractObjectKeyFromUrl(pictureUrl);
+
+            log.info("解析图片对象键: {}", objectKey);
+            key = objectKey;
+            bucket = bucketName;
+        }
+        // 调用腾讯云API获取图片标签
+        ImageLabelResponse response = tencentCiImageLabelApi.getImageLabel(bucket, key);
+        // 解析返回结果 - 使用getResultJson获取JSON结果，然后解析
+        String resultJson;
+        try {
+            resultJson = response.getResultJson();
+        } catch (Exception e) {
+            log.error("获取图片标签结果JSON失败", e);
+            return new ArrayList<>();
+        }
+
+        if (StrUtil.isBlank(resultJson)) {
+            return new ArrayList<>();
+        }
+
+        // 解析JSON结果
+        try {
+            log.info("开始解析图片标签JSON结果: {}", resultJson);
+
+            // 使用Hutool的JSONUtil解析JSON
+            // 检查结果是否是数组格式
+            if (resultJson.trim().startsWith("[")) {
+                // 直接解析为数组
+                JSONArray labelsArray = JSONUtil.parseArray(resultJson);
+                if (labelsArray == null || labelsArray.isEmpty()) {
+                    return new ArrayList<>();
+                }
+                // 将腾讯云API返回的标签转换为内部模型
+                return labelsArray.stream().map(obj -> {
+                    JSONObject labelObj = (JSONObject) obj;
+                    return new TencentImageLabelResult(labelObj.getStr("name"),
+                            labelObj.getFloat("confidence"), labelObj.getStr("firstCategory"),
+                            labelObj.getStr("secondCategory"));
+                }).collect(Collectors.toList());
+            } else {
+                // 解析为对象，然后获取Labels数组
+                JSONObject jsonObject = JSONUtil.parseObj(resultJson);
+                JSONArray labelsArray = jsonObject.getJSONArray("Labels");
+
+                if (labelsArray == null || labelsArray.isEmpty()) {
+                    return new ArrayList<>();
+                }
+
+                // 将腾讯云API返回的标签转换为内部模型
+                return labelsArray.stream().map(obj -> {
+                    JSONObject labelObj = (JSONObject) obj;
+                    return new TencentImageLabelResult(labelObj.getStr("name"),
+                            labelObj.getFloat("confidence"), labelObj.getStr("firstCategory"),
+                            labelObj.getStr("secondCategory"));
+                }).collect(Collectors.toList());
+            }
+        } catch (Exception e) {
+            log.error("解析图片标签结果失败，原始JSON: {}", resultJson, e);
+            return new ArrayList<>();
+        }
     }
 }
