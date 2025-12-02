@@ -10,6 +10,8 @@ import com.xm.draw2drawbackend.constant.UserConstant;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.manager.CosManager;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,7 @@ import java.io.IOException;
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "File")
 @RestController
 @Slf4j
 @RequestMapping("/file")
@@ -38,6 +41,7 @@ public class FileController {
      * @param multipartFile
      * @return
      */
+    @ApiOperation("测试文件上传")
     @PostMapping("/test/upload")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<String> testUploadFile(@RequestPart("file") MultipartFile multipartFile) {
@@ -72,6 +76,7 @@ public class FileController {
      * @param filepath 文件路径
      * @param response 响应对象
      */
+    @ApiOperation("测试文件下载")
     @GetMapping("/test/download")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public void testDownloadFile(String filepath, HttpServletResponse response) throws IOException {

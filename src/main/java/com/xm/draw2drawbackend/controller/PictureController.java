@@ -35,6 +35,8 @@ import com.xm.draw2drawbackend.model.vo.PictureVO;
 import com.xm.draw2drawbackend.service.PictureService;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -55,6 +57,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "Picture")
 @RestController
 @Slf4j
 @RequestMapping("/picture")
@@ -93,6 +96,7 @@ public class PictureController {
     /**
      * 上传图片（可重新上传）
      */
+    @ApiOperation("上传图片")
     @PostMapping("/upload")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
     public BaseResponse<PictureVO> uploadPicture(@RequestPart("file") MultipartFile multipartFile,
@@ -106,6 +110,7 @@ public class PictureController {
     /**
      * 通过URL上传图片（可重新上传）
      */
+    @ApiOperation("通过URL上传图片")
     @PostMapping("/upload/url")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_UPLOAD)
     public BaseResponse<PictureVO> uploadPictureByUrl(
@@ -120,6 +125,7 @@ public class PictureController {
     /**
      * 批量爬取并创建图片
      */
+    @ApiOperation("批量爬取并创建图片")
     @PostMapping("/upload/batch")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Integer> uploadPictureByBatch(
@@ -135,6 +141,7 @@ public class PictureController {
     /**
      * 删除图片
      */
+    @ApiOperation("删除图片")
     @PostMapping("/delete")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_DELETE)
     public BaseResponse<Boolean> deletePicture(DeleteRequest deleteRequest,
@@ -152,6 +159,7 @@ public class PictureController {
      * @param request
      * @return
      */
+    @ApiOperation("更新图片")
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updatePicture(
@@ -185,6 +193,7 @@ public class PictureController {
     /**
      * 根据 id 获取图片（仅管理员可用）
      */
+    @ApiOperation("根据ID获取图片（仅管理员）")
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Picture> getPictureById(long id, HttpServletRequest request) {
@@ -199,6 +208,7 @@ public class PictureController {
     /**
      * 根据 id 获取图片（封装类）
      */
+    @ApiOperation("根据ID获取图片（封装类）")
     @GetMapping("/get/vo")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_VIEW)
     public BaseResponse<PictureVO> getPictureVOById(long id, HttpServletRequest request) {
@@ -231,6 +241,7 @@ public class PictureController {
     /**
      * 分页获取图片列表（仅管理员可用）
      */
+    @ApiOperation("分页获取图片列表（仅管理员）")
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Picture>> listPictureByPage(
@@ -246,6 +257,7 @@ public class PictureController {
     /**
      * 分页获取图片列表（封装类）
      */
+    @ApiOperation("分页获取图片列表（封装类）")
     @PostMapping("/list/page/vo")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_VIEW)
     public BaseResponse<Page<PictureVO>> listPictureVOByPage(
@@ -284,6 +296,7 @@ public class PictureController {
     /**
      * 分页获取图片列表（封装类，有缓存）
      */
+    @ApiOperation("分页获取图片列表（封装类，有缓存）")
     @Deprecated
     @PostMapping("/list/page/vo/cache")
     public BaseResponse<Page<PictureVO>> listPictureVOByPageWithCache(
@@ -334,6 +347,7 @@ public class PictureController {
     /**
      * 编辑图片（给用户使用）
      */
+    @ApiOperation("编辑图片")
     @PostMapping("/edit")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
     public BaseResponse<Boolean> editPicture(@RequestBody PictureEditRequest pictureEditRequest,
@@ -347,6 +361,7 @@ public class PictureController {
     /**
      * 获取所有图片标签分类
      */
+    @ApiOperation("获取所有图片标签分类")
     @GetMapping("/tag_category")
     public BaseResponse<PictureTagCategory> listPictureTagCategory() {
         PictureTagCategory pictureTagCategory = new PictureTagCategory();
@@ -360,6 +375,7 @@ public class PictureController {
     /**
      * 图片审核
      */
+    @ApiOperation("图片审核")
     @PostMapping("/review")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> doPictureReview(
@@ -373,6 +389,7 @@ public class PictureController {
     /**
      * 以图搜图
      */
+    @ApiOperation("以图搜图")
     @PostMapping("/search/picture")
     public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(
             @RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
@@ -389,6 +406,7 @@ public class PictureController {
     /**
      * 以色搜图
      */
+    @ApiOperation("以色搜图")
     @PostMapping("/search/color")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_VIEW)
     public BaseResponse<List<PictureVO>> searchPictureByColor(
@@ -405,6 +423,7 @@ public class PictureController {
     /**
      * 批量编辑图片（给用户使用）
      */
+    @ApiOperation("批量编辑图片")
     @PostMapping("/edit/batch")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
     public BaseResponse<Boolean> editPictureByBatch(
@@ -419,6 +438,7 @@ public class PictureController {
     /**
      * 图片标签识别
      */
+    @ApiOperation("图片标签识别")
     @PostMapping("/trigger/image_label")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
     public BaseResponse<List<TencentImageLabelResult>> triggerImageLabel(
@@ -465,6 +485,7 @@ public class PictureController {
     /**
      * 创建 AI 扩图任务
      */
+    @ApiOperation("创建AI扩图任务")
     @PostMapping("/out_painting/create_task")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_EDIT)
     public BaseResponse<CreateOutPaintingTaskResponse> createPictureOutPaintingTask(
@@ -483,6 +504,7 @@ public class PictureController {
     /**
      * 查询 AI 扩图任务
      */
+    @ApiOperation("查询AI扩图任务")
     @GetMapping("/out_painting/get_task")
     public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
         ThrowUtils.throwIf(StrUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR, "参数错误");

@@ -27,6 +27,8 @@ import com.xm.draw2drawbackend.model.entity.User;
 import com.xm.draw2drawbackend.model.vo.SpaceUserVO;
 import com.xm.draw2drawbackend.service.SpaceUserService;
 import com.xm.draw2drawbackend.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "SpaceUser")
 @RestController
 @Slf4j
 @RequestMapping("/spaceUser")
@@ -50,6 +53,7 @@ public class SpaceUserController {
     /**
      * 添加成员到空间
      */
+    @ApiOperation("添加成员到空间")
     @PostMapping("/add")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Long> addSpaceUser(@RequestBody SpaceUserAddRequest spaceUserAddRequest,
@@ -62,6 +66,7 @@ public class SpaceUserController {
     /**
      * 从空间移除成员
      */
+    @ApiOperation("从空间移除成员")
     @PostMapping("/delete")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Boolean> deleteSpaceUser(@RequestBody DeleteRequest deleteRequest,
@@ -82,6 +87,7 @@ public class SpaceUserController {
     /**
      * 查询某个成员在某个空间的信息
      */
+    @ApiOperation("查询空间成员信息")
     @PostMapping("/get")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<SpaceUser> getSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest) {
@@ -99,6 +105,7 @@ public class SpaceUserController {
     /**
      * 查询成员信息列表
      */
+    @ApiOperation("查询成员信息列表")
     @PostMapping("/list")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<List<SpaceUserVO>> listSpaceUser(@RequestBody SpaceUserQueryRequest spaceUserQueryRequest,
@@ -112,6 +119,7 @@ public class SpaceUserController {
     /**
      * 编辑成员信息（设置权限）
      */
+    @ApiOperation("编辑成员信息")
     @PostMapping("/edit")
     @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.SPACE_USER_MANAGE)
     public BaseResponse<Boolean> editSpaceUser(@RequestBody SpaceUserEditRequest spaceUserEditRequest,
@@ -137,6 +145,7 @@ public class SpaceUserController {
     /**
      * 查询我加入的团队空间列表
      */
+    @ApiOperation("查询我加入的团队空间列表")
     @PostMapping("/list/my")
     public BaseResponse<List<SpaceUserVO>> listMyTeamSpace(HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);

@@ -16,6 +16,8 @@ import com.xm.draw2drawbackend.model.vo.LoginUserVO;
 import com.xm.draw2drawbackend.model.vo.UserVO;
 import com.xm.draw2drawbackend.service.UserService;
 import com.xm.draw2drawbackend.utils.EncryptUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,6 +30,7 @@ import java.util.List;
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "User")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -41,6 +44,7 @@ public class UserController {
     /**
      * 用户注册
      */
+    @ApiOperation("用户注册")
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
@@ -55,6 +59,7 @@ public class UserController {
     /**
      * 用户登录
      */
+    @ApiOperation("用户登录")
     @PostMapping("/login")
     public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest,
             HttpServletRequest request) {
@@ -69,6 +74,7 @@ public class UserController {
     /**
      * 用户登出
      */
+    @ApiOperation("用户登出")
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         ThrowUtils.throwIf(request == null, ErrorCode.OPERATION_ERROR);
@@ -79,6 +85,7 @@ public class UserController {
     /**
      * 获取当前登录用户
      */
+    @ApiOperation("获取当前登录用户")
     @GetMapping("/get/login")
     public BaseResponse<LoginUserVO> getLoginUser(HttpServletRequest request) {
         User loginUser = userService.getLoginUser(request);
@@ -88,6 +95,7 @@ public class UserController {
     /**
      * 用户添加（管理员）
      */
+    @ApiOperation("用户添加（仅管理员）")
     @PostMapping("/add")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAdddRequest) {
@@ -107,6 +115,7 @@ public class UserController {
     /**
      * 获取用户（管理员）
      */
+    @ApiOperation("获取用户（仅管理员）")
     @PostMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(Long userId) {
@@ -119,6 +128,7 @@ public class UserController {
     /**
      * 根据 id 获取包装类
      */
+    @ApiOperation("根据ID获取用户信息（封装类）")
     @GetMapping("/get/vo")
     public BaseResponse<UserVO> getUserVoById(long userId) {
         BaseResponse<User> response = getUserById(userId);
@@ -129,6 +139,7 @@ public class UserController {
     /**
      * 删除用户（管理员）
      */
+    @ApiOperation("删除用户（仅管理员）")
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody UserDeleteRequest userDeleteRequest) {
@@ -143,6 +154,7 @@ public class UserController {
     /**
      * 更新用户（管理员）
      */
+    @ApiOperation("更新用户（仅管理员）")
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
@@ -158,6 +170,7 @@ public class UserController {
     /**
      * 用户更新自己的信息
      */
+    @ApiOperation("用户更新自己的信息")
     @PostMapping("/update/my")
     public BaseResponse<Boolean> updateMyInfo(@RequestBody UserMyInfoUpdateRequest userMyInfoUpdateRequest,
                                              HttpServletRequest request) {
@@ -183,6 +196,7 @@ public class UserController {
     /**
      * 分页获取用户封装列表（除管理员）
      */
+    @ApiOperation("分页获取用户列表")
     @PostMapping("/list/page/vo")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
@@ -200,6 +214,7 @@ public class UserController {
     /**
      * 上传用户头像
      */
+    @ApiOperation("上传用户头像")
     @PostMapping("/upload/avatar")
     public BaseResponse<String> uploadUserAvatar(
             @RequestPart("file") MultipartFile multipartFile,
@@ -231,6 +246,7 @@ public class UserController {
     /**
      * 兑换会员
      */
+    @ApiOperation("兑换会员")
     @PostMapping("/exchange/vip")
     public BaseResponse<Boolean> exchangeVip(@RequestBody VipExchangeRequest vipExchangeRequest,
             HttpServletRequest httpServletRequest) {

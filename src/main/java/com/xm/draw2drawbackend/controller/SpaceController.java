@@ -18,6 +18,8 @@ import com.xm.draw2drawbackend.model.enums.SpaceLevelEnum;
 import com.xm.draw2drawbackend.model.vo.SpaceVO;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "Space")
 @RestController
 @Slf4j
 @RequestMapping("/space")
@@ -54,6 +57,7 @@ public class SpaceController {
     /**
      * 创建空间
      */
+    @ApiOperation("创建空间")
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(spaceAddRequest == null, ErrorCode.PARAMS_ERROR, "参数错误");
@@ -65,6 +69,7 @@ public class SpaceController {
     /**
      * 删除空间（仅管理员可用）
      */
+    @ApiOperation("删除空间")
     @PostMapping("/delete")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteSpace(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
@@ -88,6 +93,7 @@ public class SpaceController {
     /**
      * 更新空间（仅管理员可用）
      */
+    @ApiOperation("更新空间（仅管理员）")
     @PostMapping("/update")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateSpace(@RequestBody SpaceUpdateRequest spaceUpdateRequest,
@@ -115,6 +121,7 @@ public class SpaceController {
     /**
      * 根据 id 获取空间（仅管理员可用）
      */
+    @ApiOperation("根据ID获取空间（仅管理员）")
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Space> getSpaceById(Long id, HttpServletRequest request) {
@@ -129,6 +136,7 @@ public class SpaceController {
     /**
      * 根据 id 获取空间（封装类）
      */
+    @ApiOperation("根据ID获取空间（封装类）")
     @GetMapping("/get/vo")
     public BaseResponse<SpaceVO> getSpaceVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
@@ -147,6 +155,7 @@ public class SpaceController {
     /**
      * 分页获取空间列表（仅管理员可用）
      */
+    @ApiOperation("分页获取空间列表")
     @PostMapping("/list/page")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Space>> listSpaceByPage(@RequestBody SpaceQueryRequest spaceQueryRequest) {
@@ -161,6 +170,7 @@ public class SpaceController {
     /**
      * 分页获取空间列表（封装类）
      */
+    @ApiOperation("分页获取空间列表（封装类）")
     @PostMapping("/list/page/vo")
     public BaseResponse<Page<SpaceVO>> listSpaceVOByPage(@RequestBody SpaceQueryRequest spaceQueryRequest,
             HttpServletRequest request) {
@@ -178,6 +188,7 @@ public class SpaceController {
     /**
      * 编辑空间（给用户使用）
      */
+    @ApiOperation("编辑空间")
     @PostMapping("/edit")
     public BaseResponse<Boolean> editSpace(@RequestBody SpaceEditRequest spaceEditRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(spaceEditRequest == null || spaceEditRequest.getId() <= 0,
@@ -212,6 +223,7 @@ public class SpaceController {
      *
      * @return 空间级别列表
      */
+    @ApiOperation("获取空间级别列表")
     @GetMapping("/list/level")
     public BaseResponse<List<SpaceLevel>> listSpaceLevel() {
         List<SpaceLevel> spaceLevelList = Arrays.stream(SpaceLevelEnum.values())

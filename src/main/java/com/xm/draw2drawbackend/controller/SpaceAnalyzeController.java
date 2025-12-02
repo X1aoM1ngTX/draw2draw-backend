@@ -11,6 +11,8 @@ import com.xm.draw2drawbackend.model.vo.space.analyze.*;
 import com.xm.draw2drawbackend.service.SpaceAnalyzeService;
 import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,10 +24,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 空间控制器
+ * 空间分析控制器
  *
  * @author X1aoM1ngTX
  */
+@Api(tags = "SpaceAnalyze")
 @RestController
 @Slf4j
 @RequestMapping("/space/analyze")
@@ -43,6 +46,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间使用状态
      */
+    @ApiOperation("获取空间使用状态")
     @PostMapping("/usage")
     public BaseResponse<SpaceUsageAnalyzeResponse> getSpaceUsageAnalyze(
             @RequestBody SpaceUsageAnalyzeRequest spaceUsageAnalyzeRequest,
@@ -57,6 +61,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间分类使用状态
      */
+    @ApiOperation("获取空间分类使用状态")
     @PostMapping("/category")
     public BaseResponse<List<SpaceCategoryAnalyzeResponse>> getSpaceCategoryAnalyze(
             @RequestBody SpaceCategoryAnalyzeRequest spaceCategoryAnalyzeRequest, HttpServletRequest request) {
@@ -70,6 +75,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间标签使用状态
      */
+    @ApiOperation("获取空间标签使用状态")
     @PostMapping("/tag")
     public BaseResponse<List<SpaceTagAnalyzeResponse>> getSpaceTagAnalyze(
             @RequestBody SpaceTagAnalyzeRequest spaceTagAnalyzeRequest, HttpServletRequest request) {
@@ -84,6 +90,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间大小使用状态
      */
+    @ApiOperation("获取空间大小使用状态")
     @PostMapping("/size")
     public BaseResponse<List<SpaceSizeAnalyzeResponse>> getSpaceSizeAnalyze(
             @RequestBody SpaceSizeAnalyzeRequest spaceSizeAnalyzeRequest, HttpServletRequest request) {
@@ -97,6 +104,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间用户使用状态
      */
+    @ApiOperation("获取空间用户使用状态")
     @PostMapping("/user")
     public BaseResponse<List<SpaceUserAnalyzeResponse>> getSpaceUserAnalyze(
             @RequestBody SpaceUserAnalyzeRequest spaceUserAnalyzeRequest, HttpServletRequest request) {
@@ -110,6 +118,7 @@ public class SpaceAnalyzeController {
     /**
      * 获取空间排行数据
      */
+    @ApiOperation("获取空间排行数据")
     @PostMapping("/rank")
     public BaseResponse<List<Space>> getSpaceRankAnalyze(@RequestBody SpaceRankAnalyzeRequest spaceRankAnalyzeRequest,
                                                          HttpServletRequest request) {
