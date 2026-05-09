@@ -207,10 +207,10 @@ public class PictureController {
 
     /**
      * 根据 id 获取图片（封装类）
+     * 公共空间的图片允许未登录用户查看，私有空间需要登录并校验权限
      */
     @ApiOperation("根据ID获取图片（封装类）")
     @GetMapping("/get/vo")
-    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_VIEW)
     public BaseResponse<PictureVO> getPictureVOById(long id, HttpServletRequest request) {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR, "参数错误");
         // 查询数据库
@@ -220,17 +220,20 @@ public class PictureController {
         Long spaceId = picture.getSpaceId();
         Space space = null;
         if (spaceId != null) {
-            // 获取当前登录用户(已经改用Sa-Token鉴权)
-            // User loginUser = userService.getLoginUser(request);
-            // pictureService.checkPictureAuth(loginUser, picture);
+            // 私有空间需要登录并校验权限
             boolean hasPermission =
                     StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH, "没有权限");
             space = spaceService.getById(spaceId);
             ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
         }
-        // 获取权限列表
-        User loginUser = userService.getLoginUser(request);
+        // 尝试获取当前登录用户（未登录则为null）
+        User loginUser = null;
+        try {
+            loginUser = userService.getLoginUser(request);
+        } catch (Exception ignored) {
+            // 未登录，允许查看公共空间图片
+        }
         List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
         PictureVO pictureVO = pictureService.getPictureVO(picture, request);
         pictureVO.setPermissionList(permissionList);
@@ -256,10 +259,10 @@ public class PictureController {
 
     /**
      * 分页获取图片列表（封装类）
+     * 公共图库允许未登录用户查看，私有空间需要登录并校验权限
      */
     @ApiOperation("分页获取图片列表（封装类）")
     @PostMapping("/list/page/vo")
-    @SaSpaceCheckPermission(value = SpaceUserPermissionConstant.PICTURE_VIEW)
     public BaseResponse<Page<PictureVO>> listPictureVOByPage(
             @RequestBody PictureQueryRequest pictureQueryRequest, HttpServletRequest request) {
         long current = pictureQueryRequest.getCurrent();
@@ -279,12 +282,6 @@ public class PictureController {
             boolean hasPermission =
                     StpKit.SPACE.hasPermission(SpaceUserPermissionConstant.PICTURE_VIEW);
             ThrowUtils.throwIf(!hasPermission, ErrorCode.NO_AUTH, "没有空间权限");
-            // 私有空间(已经改用Sa-Token鉴权)
-            // User loginUser = userService.getLoginUser(request);
-            // Space space = spaceService.getById(spaceId);
-            // ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR, "空间不存在");
-            // ThrowUtils.throwIf(!loginUser.getId().equals(space.getUserId()),
-            // ErrorCode.NO_AUTH, "没有空间权限");
         }
         // 查询数据库
         Page<Picture> picturePage = pictureService.page(new Page<>(current, size),

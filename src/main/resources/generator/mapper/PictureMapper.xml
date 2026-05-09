@@ -28,6 +28,9 @@
         <result property="thumbnailUrl" column="thumbnailUrl" jdbcType="VARCHAR"/>
         <result property="spaceId" column="spaceId" jdbcType="BIGINT"/>
         <result property="picColor" column="picColor" jdbcType="VARCHAR"/>
+        <result property="sourceType" column="sourceType" jdbcType="VARCHAR"/>
+        <result property="aiTaskId" column="aiTaskId" jdbcType="BIGINT"/>
+        <result property="metadataJson" column="metadataJson" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -35,6 +38,6 @@
         tags,picSize,picWidth,picHeight,picScale,
         picFormat,userId,createTime,editTime,updateTime,
         isDelete,reviewStatus,reviewMessage,reviewerId,
-        reviewTime,thumbnailUrl,spaceId,picColor
+        reviewTime,thumbnailUrl,spaceId,picColor,sourceType,aiTaskId,metadataJson
     </sql>
 </mapper>

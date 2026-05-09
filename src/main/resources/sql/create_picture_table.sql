@@ -1,4 +1,4 @@
--- 图片表  
+-- 图片表
 create table if not exists picture
 (
     id           bigint auto_increment comment 'id' primary key,
@@ -47,3 +47,11 @@ CREATE INDEX idx_spaceId ON picture (spaceId);
 
 ALTER TABLE picture
     ADD COLUMN picColor varchar(16) null comment '图片主色调';
+
+-- AI生成功能新增字段
+ALTER TABLE picture
+    ADD COLUMN sourceType   VARCHAR(32) DEFAULT 'UPLOAD' COMMENT '来源：UPLOAD/AI_GENERATED',
+    ADD COLUMN aiTaskId     BIGINT      DEFAULT NULL COMMENT '关联的AI任务ID',
+    ADD COLUMN metadataJson TEXT COMMENT '元数据JSON（prompt, params, model）';
+
+CREATE INDEX idx_ai_task_id ON picture (aiTaskId);

@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xm.draw2drawbackend.exception.BusinessException;
 import com.xm.draw2drawbackend.exception.ErrorCode;
 import com.xm.draw2drawbackend.exception.ThrowUtils;
-import com.xm.draw2drawbackend.manager.sharding.DynamicShardingManager;
 import com.xm.draw2drawbackend.mapper.SpaceMapper;
 import com.xm.draw2drawbackend.model.dto.space.SpaceAddRequest;
 import com.xm.draw2drawbackend.model.dto.space.SpaceQueryRequest;
@@ -25,7 +24,6 @@ import com.xm.draw2drawbackend.service.SpaceService;
 import com.xm.draw2drawbackend.service.SpaceUserService;
 import com.xm.draw2drawbackend.service.UserService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
 

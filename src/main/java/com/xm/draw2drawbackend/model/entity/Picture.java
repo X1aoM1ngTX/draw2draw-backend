@@ -134,4 +134,19 @@ public class Picture implements Serializable {
      * 图片主色调
      */
     private String picColor;
+
+    /**
+     * 来源：UPLOAD/AI_GENERATED
+     */
+    private String sourceType;
+
+    /**
+     * 关联的AI任务ID
+     */
+    private Long aiTaskId;
+
+    /**
+     * 元数据JSON（prompt, params, model）
+     */
+    private String metadataJson;
 }
